@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mt211211.github.io/tendorbit/sitemap.xml
+
