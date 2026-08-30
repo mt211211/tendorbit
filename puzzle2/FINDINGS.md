@@ -241,3 +241,36 @@ separate 0/8/6/9/D, so none is promoted to confident.
 | Part 2 static block | 2 | **2** (`C`, `8`) |
 | Part 2 column | ~16 | 0 (hard-cut window) |
 | **Total** | **~37** | **12** |
+
+## Single-frame flash search, background differencing, constructed candidates
+
+Three more mechanisms tested, all negative:
+
+- **Single-frame flash.** Puzzle #1's statement B hides its key in a one-frame
+  flash, so both Puzzle #2 videos were scanned for frame-to-frame anomalies.
+  The method works: it ranks the control's flash at frame 1180 top. Puzzle #2's
+  largest jumps are the end fade-out (part 1, frame 1718, a steady brightness
+  decay) and title-card transitions (part 2, frames 730, 1220, 1550). No
+  payload flash exists in either video.
+- **Static overlay unique to one video.** Both videos share the same scene, so
+  differencing their temporal medians cancels it. The difference contains only
+  the title digit ('1' vs '2'). No hidden static overlay.
+- **Constructed candidates.** 36 keys built from the confirmed characters
+  (`6A6B0860B4`, `C8`, seam B's `0A0D0800D`) by repetition, reversal and
+  zero/F padding were tested against the oracle. All rejected.
+
+## Assessment
+
+Puzzle #1 was solved within three hours of release. Puzzle #2 has stood for
+eight years with roughly 785 combined channel views. Its two videos contain
+about 37 character slots against the 64 the answer needs, and the shortfall is
+geometric -- windows and frame boundaries baked into the footage -- not a
+processing or resolution limit. Every mechanism the author is known to have
+used (direct faint rendering, rotated columns, edge wrapping, mirroring, decoy
+overlay, single-frame flash, silent audio) has now been tested with methods
+validated against Puzzle #1's published answer.
+
+The likeliest explanation consistent with all of the evidence is that Puzzle #2
+as published does not contain its complete key. That is a claim about the
+footage, and it is falsifiable: a source showing more than these files, or a
+mechanism not yet conceived, would overturn it.
