@@ -167,3 +167,37 @@ It was not.
 
 This rules out the last mechanism by which the missing characters could have
 been present but unreadable. They are absent, not degraded.
+
+## Audio ruled out
+
+All nine video files obtained were video-only itags (311/298), so the audio
+tracks went unexamined until now. Spectrogram steganography is common in this
+genre, so this was a real gap. It is now closed, and the control settles it
+decisively:
+
+- **Puzzle #1's statement video A -- the one carrying its full key -- has a
+  completely silent audio track** (all samples zero, verified). The author
+  demonstrably does not hide payload in audio.
+- Puzzle #2's two tracks are ordinary music, correlating 0.98 with Puzzle #1's,
+  with the usual AAC lowpass near 16 kHz and an empty band above 15 kHz
+  (mean magnitude 0.0013) where spectrogram text would live.
+- The two Puzzle #2 tracks differ in only 13,075 of 1,443,353 samples, confined
+  to a 0.46s burst at 20.53-20.99s. Its spectrogram is scattered unstructured
+  blobs at -41 dB relative to signal: AAC quantisation noise at a loud
+  transient, not a payload.
+
+## Other hypotheses tested and rejected this round
+
+- **Column glyphs are complete.** Rejected. An earlier `edge_report` reading of
+  `cut=False` was the taper test being fooled by curved glyph edges; rendering
+  layer X at 7x magnification shows hard vertical cuts on both sides. The
+  column is truncated, as originally assessed.
+- **The two videos combine.** Rejected. Their payloads never coincide in time --
+  part 1 shows only fog during part 2's column. Overlay, mirrored overlay and
+  vertical-roll alignment all produce nothing.
+- **Micro-text hidden beneath the column glyphs.** Rejected; a 9px high-pass
+  over the column region returns glyph outlines only.
+- **Payload concealed under the static `4` decoy.** Rejected; subtracting a
+  median-estimated decoy across frames 1262-1442 leaves only background cloud
+  motion.
+- **Seam A begins before frame 1219.** Rejected; frames 1190-1218 are fog.
