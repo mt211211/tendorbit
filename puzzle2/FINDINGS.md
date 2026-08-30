@@ -64,12 +64,17 @@ find payload in only these places:
 | Source | Character slots | Readable |
 |---|---|---|
 | Part 1 seam A (1219-1260) | 10 | **10** -- `6A6B0860B4` |
-| Part 1 seam B (1454-1560) | ~8 | 0 -- glyphs are halves; top-edge content shows character bottoms, bottom-edge content shows different characters' tops |
+| Part 1 seam B (1454-1475) | ~6 | 0 confident -- glyphs are bottom halves only (ink spans y0-56 of a ~100px character, tops off-frame, no wrap counterpart). Visible sequence reads `0 A 0 D 0 D` before the decoy takes over, but a bottom half does not separate 0/8/6/9/D |
 | Part 2 static block | 2 | **2** -- `C`, `8` |
 | Part 2 column (2 layers) | ~16 | 0 -- truncated to ~half width, several merged |
 | Everything else | 0 | title cards, the `4` decoy, and background fog |
 
-**Total slots present: about 36. Total confidently read: 12.**
+**Total slots present: about 34. Total confidently read: 12.**
+
+Exhaustively verified: every remaining edge-activity burst in part 1 (frames
+147-193, 800-855, 996-1007, 1104-1136) and every glyph-component run in part 2
+(12-102, 110-172, 288-306, 716-726) contains only title cards, the static `4`
+decoy, or background fog -- no payload.
 
 Even a perfect read of every glyph that physically exists in these two files
 recovers about 36 of the 64 characters. The remaining ~28 are not in the
