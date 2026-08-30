@@ -201,3 +201,43 @@ decisively:
   median-estimated decoy across frames 1262-1442 leaves only background cloud
   motion.
 - **Seam A begins before frame 1219.** Rejected; frames 1190-1218 are fog.
+
+## Final round: baseline detector, seam B refined, further rejections
+
+**A reliable micro-text detector.** Scoring candidate row bands by baseline
+alignment (component count divided by 1 + std of component bottom edges)
+finally separates text from fog. On Puzzle #1 it puts every top hit at exactly
+y=360 -- its real key line -- with baseline-std 0.56 to 1.05. Applied to both
+Puzzle #2 videos at 3x bitrate, the best candidates sit at y=0-30 with
+baseline-std 3.9 to 5.7: fog texture, not text. This is now a validated
+negative rather than an absence of evidence.
+
+**Seam B has 9 states, not 6.** Per-frame correlation at a 0.99 threshold
+(rather than 0.96) resolves nine distinct glyphs before the decoy:
+`0 A 0 D 0 8 0 0 D`. They remain bottom halves only, and a bottom half does not
+separate 0/8/6/9/D, so none is promoted to confident.
+
+**Also rejected this round:**
+
+- Part 2's column window is a hard cut, measured: mean residual jumps 14x at
+  x=622 and falls 26x at x=664, with background level either side. Nothing
+  exists outside the window at any threshold.
+- Part 2 has no content at its frame edges during the column (0 ink at
+  threshold 140), so the missing halves do not wrap to the edges the way part
+  1's do.
+- The two column layers are not adjacent slices: stroke continuity across every
+  candidate join (X|Z, Z|X, and all mirrored orderings) is 0.000 to 0.224,
+  against 0.633 for part 1's genuine wrap.
+- The column window does not wrap internally: the high continuity scores at
+  particular roll offsets (0.986 for X at 22px) come from joins landing in
+  blank rows, and rendering shows only shifted fragments.
+
+## Census after all refinements
+
+| Source | Slots | Confident |
+|---|---|---|
+| Part 1 seam A | 10 | **10** (`6A6B0860B4`) |
+| Part 1 seam B | 9 | 0 (bottom halves) |
+| Part 2 static block | 2 | **2** (`C`, `8`) |
+| Part 2 column | ~16 | 0 (hard-cut window) |
+| **Total** | **~37** | **12** |
