@@ -92,3 +92,42 @@ that the footage does not contain the whole key. Puzzle #2 as published does not
 appear to be solvable from these two videos alone. What would change that is a
 source showing more than these files do, or a mechanism (not visible in the
 frames) that expands the ~36 recovered characters into 64.
+
+## The control experiment (Puzzle #1's statement videos)
+
+Puzzle #1's answer is published, so its statement videos are a ground-truth
+control: whatever mechanism hides a full 64-character key there should also be
+hiding Puzzle #2's.
+
+**Result: the control worked, and it rules Puzzle #2's mechanism out.**
+
+Puzzle #1 hides its key as a **faint, static, low-contrast horizontal line of
+small text across the vertical centre of the frame** (y 352-374) in statement
+video `3l1jFa3Mw0s`. A spatial high-pass (subtract a 25px uniform filter from a
+frame average, then percentile-stretch) reads it directly:
+
+    4487FC620AD0C4C67E80BE342B2...
+
+matching the published answer. Statement video `hX-pOBj8VsI` additionally
+flashes the same key, reversed and rotated 90 degrees, as a small vertical
+column for a **single frame** (frame 1180).
+
+Two things follow.
+
+**The method is validated.** Temporal background subtraction actively destroys
+this kind of payload -- a static faint line is voted into the median background
+and subtracted to nothing. Spatial high-pass on a frame average is what recovers
+it. That is why the earlier passes over Puzzle #2 could not have found such a
+line even if one existed.
+
+**Puzzle #2 does not use this mechanism.** With the validated method applied
+exhaustively to both Puzzle #2 videos -- every 100- and 150-frame window, every
+row band, the exact centre row that carries Puzzle #1's line, and the tail
+frames after the column -- there is no hidden text line. The centre band at the
+most promising window is background texture, not glyphs. Puzzle #2's payload is
+only what the census above lists: the two edge seams, the static block, and the
+truncated column.
+
+This closes the most promising remaining lead. Puzzle #1 renders its key
+directly and completely; Puzzle #2 renders a partial key through truncating
+windows, and the missing characters are not hidden elsewhere in the frames.
