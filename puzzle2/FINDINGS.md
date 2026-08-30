@@ -131,3 +131,39 @@ truncated column.
 This closes the most promising remaining lead. Puzzle #1 renders its key
 directly and completely; Puzzle #2 renders a partial key through truncating
 windows, and the missing characters are not hidden elsewhere in the frames.
+
+## Higher-bitrate renditions (3x) change nothing structural
+
+A second pair of renditions of Puzzle #2's videos, roughly 3x the bitrate of the
+itag 311 streams and encoded differently, was tested:
+
+| | itag 311 | higher-bitrate pair |
+|---|---|---|
+| part 1 | 469 kb/s, h264 **High** | **1324 kb/s**, h264 **Main** |
+| part 2 | 419 kb/s, h264 High | **1351 kb/s**, h264 Main |
+
+The profile change (High -> Main) means these are not simply a better YouTube
+transcode of the same ladder; they are a different encode, plausibly closer to
+the author's original upload. That makes them the strongest available test of
+whether compression was destroying the evidence.
+
+It was not.
+
+- **No hidden text line.** The band-wise high-pass search was first fixed
+  against ground truth: stretching each row band separately (rather than the
+  whole frame) is what makes Puzzle #1's line detectable, showing 32-34
+  components at y 336-350. A whole-frame stretch misses it entirely, which is
+  why an earlier version of this search produced a false negative. With the
+  corrected, ground-truth-validated detector applied to the higher-bitrate
+  Puzzle #2 pair, the only recurring band is y=434, and it resolves under
+  inspection to background fog and the scene's geometric overlay lines --
+  component heights scatter from 6 to 15px, against the control line's uniform
+  run. There is no text line in Puzzle #2 at any bitrate.
+- **The truncation is geometric, not compression.** The column's bounding box is
+  identical in both encodes: x 617-663, width 47px. Tripling the bitrate does
+  not widen it by a pixel, because the window edge is baked into the footage.
+- **Seam A re-confirms.** The same glyph sequence reads `6 A 6 B 0 8 6 0 ... 4`
+  from the higher-bitrate source, reproducing `6A6B0860B4` a third time.
+
+This rules out the last mechanism by which the missing characters could have
+been present but unreadable. They are absent, not degraded.
