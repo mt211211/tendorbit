@@ -49,12 +49,13 @@ README describes, not payload. Fitting and subtracting it leaves nothing new.
   MIRROR (y446-480). Confirms the upstream `C`/`8` reading.
 - Alternating column (frames 1550-1618): three states cycle X->Y->Z->Y->X.
   `corr(Y, max(X,Z)) = 0.9996`, so **Y is exactly X overlaid with Z** and X, Z
-  are the two separate layers. Each layer holds ~7-9 characters.
+  are the two separate layers.
 - The column window is hard-cut: x 622-656 (34px) per state, widening to 47px
-  when all states are combined, against a ~65px character width. Partial
-  (masked) matching against the labelled library gives best scores of 0.3-0.7
-  with coverage 0.20-0.85 and margins under 0.1 -- not a readable result.
+  when all states are combined, against a ~65px character width.
 - The column does not scroll, and rotating it does not produce a text line.
+- **Superseded below.** X and Z are not two independent strings but the two
+  halves of one; joined, the column reads `723504`. See "The column is a split
+  glyph, and it joins".
 
 ## The blocking result: there are not 64 character-slots in these videos
 
@@ -63,35 +64,126 @@ find payload in only these places:
 
 | Source | Character slots | Readable |
 |---|---|---|
-| Part 1 seam A (1219-1260) | 10 | **10** -- `6A6B0860B4` |
-| Part 1 seam B (1454-1475) | ~6 | 0 confident -- glyphs are bottom halves only (ink spans y0-56 of a ~100px character, tops off-frame, no wrap counterpart). Visible sequence reads `0 A 0 D 0 D` before the decoy takes over, but a bottom half does not separate 0/8/6/9/D |
+| Part 1 seam A (1220-1260) | 10 | **10** -- `6A6B0860B4` |
+| Part 1 seam B (1455-1496) | 10 | **10** -- `6A6B0860B4` again, the same ten characters re-encoded (see below) |
 | Part 2 static block | 2 | **2** -- `C`, `8` |
-| Part 2 column (2 layers) | ~16 | 0 -- truncated to ~half width, several merged |
+| Part 2 column | 6 | **6** -- `723504` (see below) |
 | Everything else | 0 | title cards, the `4` decoy, and background fog |
 
-**Total slots present: about 34. Total confidently read: 12.**
+**Total distinct slots present: 18. Total confidently read: 18.**
+(Seam B repeats seam A, so the two seams together carry ten characters, not
+twenty.)
 
 Exhaustively verified: every remaining edge-activity burst in part 1 (frames
 147-193, 800-855, 996-1007, 1104-1136) and every glyph-component run in part 2
 (12-102, 110-172, 288-306, 716-726) contains only title cards, the static `4`
 decoy, or background fog -- no payload.
 
-Even a perfect read of every glyph that physically exists in these two files
-recovers about 36 of the 64 characters. The remaining ~28 are not in the
-published footage at any resolution, because there is nowhere in either video
-that they appear.
+Every glyph that physically exists in these two files has now been read. That is
+18 of the 64 characters. The remaining 46 are not in the published footage at
+any resolution, because there is nowhere in either video that they appear.
 
-With 52 characters unknown the search space is 16^52 = 4.1e62, and with a
-perfect read of everything present it would still be 16^28 = 5.2e33. Neither is
-reachable. `assemble.sweep()` refuses both.
+With 46 characters unknown the search space is 16^46 = 1.1e55. That is not
+reachable, and `assemble.sweep()` refuses it.
 
 ## What this means
 
-The reading is no longer the bottleneck for what is *present*; the bottleneck is
-that the footage does not contain the whole key. Puzzle #2 as published does not
-appear to be solvable from these two videos alone. What would change that is a
-source showing more than these files do, or a mechanism (not visible in the
-frames) that expands the ~36 recovered characters into 64.
+The reading is no longer the bottleneck at all: everything present has been
+read. The bottleneck is that the footage does not contain the whole key.
+Puzzle #2 as published does not appear to be solvable from these two videos
+alone. What would change that is a source showing more than these files do, or a
+mechanism (not visible in the frames) that expands the 18 recovered characters
+into 64.
+
+## The two seams are one message, split twice
+
+Part 1 carries its ten characters twice, through two independent splits, and
+both splits use the same trick: **the glyph is cut in half and the two halves
+are shown at different times, 19 frames apart.**
+
+- **Seam A** (frames 1220-1260): the right-edge stream runs 19 frames ahead of
+  the left-edge stream. `hstack(right_band(f), left_band(f + 19))`, rotated 90
+  degrees clockwise, produces ten complete, unambiguous characters:
+  **`6A6B0860B4`**.
+- **Seam B** (frames 1455-1496): the same characters cut by the top and bottom
+  edges instead, the same 19-frame lead.
+  `vstack(bottom_band(f), top_band(f + 19))` produces them upright:
+  **`6A6B0860B4`**.
+
+Ten distinct top-edge states and ten bottom-edge states, each held 2-3 frames,
+then the composition freezes and fades. There is no eleventh character.
+
+An earlier entry here recorded seam B as "bottom halves only, no wrap
+counterpart, 0 confident". That was wrong: the counterpart exists, it is just
+offset in time rather than in space. `tools/video/decode_real.py` reproduces
+both strips.
+
+## The column is a split glyph, and it joins
+
+Part 2's column (frames 1551-1619) alternates between two still images every
+~8 frames, with the union appearing on the crossfade frames. Both images are
+identical every time they recur (Jaccard 0.997 between repeats), so there are
+exactly two layers.
+
+They are not two strings. They are the two halves of one:
+
+- state **A** carries each glyph's right part, cut at x=622;
+- state **C** carries the left part, cut at x=663.
+
+The two cuts fall at the *same point within the glyph* -- which is why the two
+cut columns are the same cross-section. Comparing them directly, they agree at
+**Jaccard 0.93 at a vertical offset of -1 px**, and the best offset is a sharp
+peak. That is the test that decides the join; a wrong pairing does not produce
+it.
+
+`hstack(state_C[:, 617:664], state_A[:, 622:658])` rejoins them into complete
+characters, six of them at a pitch of 82 px, reading **`723504`**:
+
+    7  2  3  5  0  4
+
+The strokes run continuously across the seam (the `7`'s bar and diagonal, the
+`3`'s two bowls), which is the visual confirmation of the numerical one.
+
+Earlier entries here recorded the column as "truncated to ~half width, not a
+readable result" and "each layer holds ~7-9 characters". Both are superseded:
+the truncation is real but complementary, and there are six characters, not
+14-18.
+
+## Correction to the Puzzle #1 control
+
+The control experiment above is right that Puzzle #1's statement A carries a
+faint horizontal line and that spatial high-pass on a frame average reads it.
+It is wrong about how much that line carries.
+
+Averaging all 870 frames of statement A's static hold and high-passing gives a
+line of exactly **39 components**, x 133-1235, y 360, reading
+
+    4487FC620AD0C4C67E80BE342B2EA1F5A3DC482
+
+-- positions 1-39 of the published answer, fading progressively to the right and
+stopping (there is blank frame to the right of the last `2`; the line is not cut
+off by the frame edge).
+
+Statement B carries a **different twelve**: two rows of six, rendered mirrored,
+which un-mirror to `07322E` and `A8BE35` -- positions 52-63.
+
+That is 51 of 64. Positions 40-51 and 64 are in neither video's main
+composition. They do appear, at very low opacity, in a **rotated, scattered
+layer visible only in statement A's final ~20 frames**: averaging frames
+1181-1200 and high-passing shows large 90-degree-rotated characters (`B`, `9`,
+`C`, `0`, `0`, `1`, `5`, `4`) plus a rotated column reading `0073 22EA`, all of
+which belong to the missing span `BE6FB9C24510`.
+
+Two things follow, and they are the reason this correction matters:
+
+1. **The author does render the whole key, but not all of it in one place, one
+   orientation, or one opacity.** A single carrier per video is not the pattern;
+   a main carrier plus a low-opacity transition layer is.
+2. **Puzzle #2 has no such transition layer.** The same deep-average +
+   high-pass, applied to every transition window in both Puzzle #2 videos
+   (300-720, 730-1160, 1170-1215, 1380-1450, 1620-1700, 1700-1800, and the
+   final 60 frames of each), returns title cards, the scene's geometric
+   overlays and background texture -- no glyphs. The census of 18 stands.
 
 ## The control experiment (Puzzle #1's statement videos)
 
@@ -108,9 +200,10 @@ frame average, then percentile-stretch) reads it directly:
 
     4487FC620AD0C4C67E80BE342B2...
 
-matching the published answer. Statement video `hX-pOBj8VsI` additionally
-flashes the same key, reversed and rotated 90 degrees, as a small vertical
-column for a **single frame** (frame 1180).
+matching the published answer's opening. (Superseded in detail by "Correction to
+the Puzzle #1 control" above: that line carries positions 1-39 only, statement B
+carries 52-63 mirrored, and 40-51 plus 64 appear in a low-opacity rotated layer
+in statement A's final frames.)
 
 Two things follow.
 

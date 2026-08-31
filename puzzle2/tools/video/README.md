@@ -27,3 +27,23 @@ is upright.
 
 A static `4` occupies the seam for hundreds of frames after each reveal --
 this is the decoy the author's own README mentions, not a payload character.
+
+## decode_real.py
+
+Reproduces the three real reads from the 720p60 footage:
+
+```bash
+python3 decode_real.py --frames1 f1/ --frames2 f2/ --out out/
+```
+
+Writes `seamA.png`, `seamB.png` (ten characters each, `6A6B0860B4`) and
+`column.png` (six characters, `723504`), and prints the cut-column agreement
+that decides whether the column halves actually meet -- 0.930 at a vertical
+offset of -1 px on the real frames. Below 0.8 it warns and the strip should not
+be read.
+
+All three carriers are the same trick: a glyph cut in half, with the halves
+separated in space (part 1's frame edges) or in time (part 2's alternating
+column). Rejoining them is what makes the characters readable; matching the
+halves against whole-glyph templates is what produced the earlier "not readable"
+results.
