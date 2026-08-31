@@ -563,3 +563,48 @@ refused by this session's egress policy (CONNECT 403), as are public Ethereum
 RPC endpoints. `github.com` is allowed, which is how the upstream ledger was
 read. Fetching a better rendition, or checking the escrow on-chain, has to
 happen outside this session.
+
+## Complete component census (every pixel that ever changes)
+
+The strongest form of the negative result. Take each video's temporal max minus
+its temporal min -- every pixel that changes at any point in 1800 frames --
+high-pass it, and enumerate every connected component above 4 sigma.
+
+**Part 1: 63 components.** 21 letter-sized (h 32-42) at the known title-card
+positions, spelling CRYPTO PUZZLER / PUZZLE / PART; one 268x183 block (the
+large `2` and `1`); a 225x465 and several long thin components (the square and
+diamond overlays); and **four** payload slivers -- (y0,x574,74x140) top,
+(y676,x583,44x109) bottom, (y301,x0,140x72) left, (y314,x1177,109x103) right.
+Those four are seams A and B. Nothing else.
+
+**Part 2: 20 components.** Title letters, one 445x196 block (the large `2`),
+`8` at (y240,x365,93x79), the mirrored `C` at (y240,x816,121x97), the MIRROR
+letters at y446, and the column at x622. Nothing else.
+
+Every component in both videos is accounted for. There is no unexplained ink.
+
+## The key is random, so 18 characters cannot be expanded into 64
+
+The last escape route would be a key generated from a guessable seed, since
+then the 18 read characters would only need to confirm a derivation rather than
+supply the entropy. Puzzle #1's key is the test case, because its answer is
+published:
+
+- 3,000,000 integer seeds swept as decimal strings under SHA-256 and SHA3-256
+  against `4487FC62...E35F`: no hit.
+- Its byte string carries no visible structure (one repeated byte pair in 32).
+
+It is a random 256-bit key, and Puzzle #2's is too. 18 hex characters are 72
+bits. No mechanism recovers the remaining 184 bits from footage that does not
+contain them; this is an information-theoretic bound, not a search-budget
+problem.
+
+## Audio, closed for good
+
+- **Puzzle #1's statement A -- the video that carries its key -- has an all-zero
+  audio track.** The author does not use audio.
+- Puzzle #2's two tracks are the same music (correlating 0.98 with Puzzle #1's
+  statement B), differing in one 0.44s window at 20.53-20.97s. That difference
+  is broadband 500-6000 Hz with a smooth envelope, no discrete tones, nothing
+  above 16 kHz, at -53 dB relative to signal: a codec quantisation difference at
+  a musical transient.
