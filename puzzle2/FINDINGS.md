@@ -274,3 +274,46 @@ The likeliest explanation consistent with all of the evidence is that Puzzle #2
 as published does not contain its complete key. That is a claim about the
 footage, and it is falsifiable: a source showing more than these files, or a
 mechanism not yet conceived, would overturn it.
+
+## A methodological error found and corrected: the two-stream seams
+
+Reviewing my own seam analysis exposed a real flaw. Every seam pass took
+`max(gs, key=ink)` -- the single largest component per frame -- which would
+silently discard a second character if two were visible at once. Checking that
+directly revealed something the earlier passes had obscured.
+
+**Both seams carry two edge streams, active sequentially, not one.**
+
+- Seam A: right edge holds states across frames 1219-1241, then the left edge
+  holds states across 1238-1260. The rolled component is 66px wide up to frame
+  1237 and jumps to 120px at 1239, which is the roll joining the two.
+- Seam B: top edge 1454-1474, then bottom edge 1473-1495.
+
+For seam A this is a genuine wrap and the join is correct: reading the full
+joined span (rather than one component) gives 21 states, of which ten are
+characters and the rest crossfades, reading `6A6B0860B4` -- the fourth
+independent confirmation.
+
+For seam B it is **not** a wrap. During frames 1456-1471 the bottom edge is
+completely empty: ink 0 at threshold 140, maximum value 19-20, which is the
+background noise floor. The characters visible at the top edge in that window
+have their upper portions nowhere in the frame. They are absent, not displaced.
+
+## Display-font templates on the column
+
+Templates were rebuilt from part 1's own confirmed seam glyphs (`0 4 6 8 A B`),
+so the column could be matched against the same typeface at the same size
+rather than the lighter solution-screen face. Masked correlation over every
+horizontal alignment still peaks at 0.464, against 0.654 for a *complete* glyph
+matched across *different* fonts. A 43px slice of a ~66px character does not
+carry enough shape to identify, even with a same-font reference.
+
+## Final census
+
+| Source | Slots | Recoverable | Why not |
+|---|---|---|---|
+| Part 1 seam A | 10 | **10** (`6A6B0860B4`) | complete via genuine edge wrap |
+| Part 1 seam B | 9 | 0 | tops absent from the frame entirely |
+| Part 2 static block | 2 | **2** (`C`, `8`) | complete |
+| Part 2 column | ~14 | 0 | hard-cut 43px window, both sides |
+| **Total** | **~35** | **12** | |
