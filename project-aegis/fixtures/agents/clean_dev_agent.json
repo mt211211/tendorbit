@@ -1,0 +1,20 @@
+{
+  "name": "clean-dev-agent",
+  "owner": "platform-eng@example.gov.uk",
+  "purpose": "Answer developer questions from internal documentation in a dev sandbox.",
+  "autonomy": "low",
+  "tools": [
+    {
+      "name": "search_docs",
+      "description": "Search the internal documentation index and return matching passages.",
+      "permissions": []
+    }
+  ],
+  "mcp_servers": [
+    {
+      "name": "docs-index",
+      "auth_type": "oauth",
+      "tools": ["search_docs"]
+    }
+  ]
+}

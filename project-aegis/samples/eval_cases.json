@@ -1,0 +1,67 @@
+[
+  {
+    "id": "clean-dev",
+    "agent_fixture": "clean_dev_agent.json",
+    "context": {
+      "environment": "dev",
+      "data_class": "internal",
+      "network": "allowlist",
+      "human_gate": "in_the_loop"
+    },
+    "approved": false,
+    "expected": "ACCEPTABLE",
+    "expected_codes": []
+  },
+  {
+    "id": "file-network-bridge",
+    "agent_fixture": "file_and_network_bridge.json",
+    "context": {
+      "environment": "test",
+      "data_class": "internal",
+      "network": "allowlist",
+      "human_gate": "on_the_loop"
+    },
+    "approved": false,
+    "expected": "UNACCEPTABLE",
+    "expected_codes": ["BRIDGE"]
+  },
+  {
+    "id": "prod-shell",
+    "agent_fixture": "prod_shell_agent.json",
+    "context": {
+      "environment": "prod",
+      "data_class": "confidential",
+      "network": "allowlist",
+      "human_gate": "on_the_loop"
+    },
+    "approved": false,
+    "expected": "UNACCEPTABLE",
+    "expected_codes": ["SHELL_UNSCOPED"]
+  },
+  {
+    "id": "unauth-mcp-network",
+    "agent_fixture": "unauth_mcp_network.json",
+    "context": {
+      "environment": "test",
+      "data_class": "internal",
+      "network": "allowlist",
+      "human_gate": "in_the_loop"
+    },
+    "approved": false,
+    "expected": "UNACCEPTABLE",
+    "expected_codes": ["AUTH_NONE_NETWORK"]
+  },
+  {
+    "id": "drift-after-approval",
+    "agent_fixture": "drifted_after_approval.json",
+    "context": {
+      "environment": "dev",
+      "data_class": "internal",
+      "network": "allowlist",
+      "human_gate": "in_the_loop"
+    },
+    "approved": true,
+    "expected": "UNACCEPTABLE",
+    "expected_codes": ["DRIFT_AFTER_APPROVAL"]
+  }
+]

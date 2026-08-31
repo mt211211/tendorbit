@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Aegis — CISO Agent-Risk Workbench</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+
+<header>
+  <h1>Project Aegis — CISO Agent-Risk Workbench</h1>
+  <p>Is this specific agent acceptable in this specific context? Local-first, deterministic,
+     no MCP server is ever contacted or executed. Policy {{ policy.name }} v{{ policy.version }}.</p>
+</header>
+
+<main>
+
+  <section id="pane-compose">
+    <h2>1. Compose — agent in context</h2>
+
+    <label for="fixture">Load fixture</label>
+    <select id="fixture">
+      <option value="">— choose a synthetic fixture —</option>
+      {% for entry in fixtures %}
+      <option value="{{ entry.key }}">{{ entry.label }}</option>
+      {% endfor %}
+    </select>
+    <p class="hint">Fixtures are synthetic. Nothing here touches a real system.</p>
+
+    <div class="row">
+      <div>
+        <label for="name">Agent name</label>
+        <input id="name" placeholder="clean-dev-agent">
+      </div>
+      <div>
+        <label for="owner">Owner</label>
+        <input id="owner" placeholder="team@example.gov.uk">
+      </div>
+    </div>
+
+    <label for="purpose">Purpose</label>
+    <input id="purpose" placeholder="What is this agent for?">
+
+    <div class="row">
+      <div>
+        <label for="autonomy">Autonomy</label>
+        <select id="autonomy">
+          <option value="low">low</option>
+          <option value="medium">medium</option>
+          <option value="high">high</option>
+        </select>
+      </div>
+      <div>
+        <label for="environment">Environment</label>
+        <select id="environment">
+          <option value="dev">dev</option>
+          <option value="test">test</option>
+          <option value="prod">prod</option>
+        </select>
+      </div>
+      <div>
+        <label for="data_class">Data class</label>
+        <select id="data_class">
+          <option value="public">public</option>
+          <option value="internal">internal</option>
+          <option value="confidential">confidential</option>
+          <option value="secret">secret</option>
+        </select>
+      </div>
+      <div>
+        <label for="network">Network</label>
+        <select id="network">
+          <option value="isolated">isolated</option>
+          <option value="allowlist">allowlist</option>
+          <option value="unrestricted">unrestricted</option>
+        </select>
+      </div>
+      <div>
+        <label for="human_gate">Human gate</label>
+        <select id="human_gate">
+          <option value="none">none</option>
+          <option value="on_the_loop">on_the_loop</option>
+          <option value="in_the_loop">in_the_loop</option>
+        </select>
+      </div>
+    </div>
+
+    <label for="toolsJson">Tools and MCP servers (JSON)</label>
+    <textarea id="toolsJson" spellcheck="false"></textarea>
+
+    <div class="buttons">
+      <button id="btnSave" type="button">Save agent</button>
+      <button id="btnApprove" type="button">Approve snapshot</button>
+      <button id="btnAssess" type="button">Run assess</button>
+    </div>
+    <div id="status" class="muted"></div>
+
+    <details>
+      <summary>Default policy ({{ policy.rules | length }} rules)</summary>
+      <table>
+        <thead><tr><th>Code</th><th>Severity</th><th>Why it matters</th></tr></thead>
+        <tbody>
+        {% for rule in policy.rules %}
+          <tr>
+            <td><code>{{ rule.code }}</code></td>
+            <td><span class="tag {{ rule.severity }}">{{ rule.severity }}</span></td>
+            <td>{{ rule.rationale }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </details>
+  </section>
+
+  <section id="pane-result">
+    <h2>2. Result</h2>
+    <div id="verdict" class="verdict muted">No assessment yet</div>
+    <div id="score" class="score muted">Load a fixture, save the agent, then run assess.</div>
+
+    <h3 style="font-size:12px;margin:12px 0 6px">Findings</h3>
+    <div id="findings" class="muted">—</div>
+
+    <h3 style="font-size:12px;margin:12px 0 6px">Drift</h3>
+    <div id="drift" class="muted">—</div>
+
+    <h3 style="font-size:12px;margin:12px 0 6px">Inventory</h3>
+    <div id="inventory" class="muted">—</div>
+
+    <div class="buttons">
+      <button id="btnEvidence" type="button" disabled>Download evidence pack</button>
+    </div>
+
+    <details id="evidencePreview" hidden>
+      <summary>Evidence pack preview (markdown)</summary>
+      <pre id="evidenceText" style="white-space:pre-wrap;font-size:11px"></pre>
+    </details>
+  </section>
+
+  <section id="pane-queue">
+    <h2>3. Queue — latest assessment per agent</h2>
+    <div class="buttons"><button id="btnRefresh" type="button">Refresh queue</button></div>
+    <div id="queue" class="muted">—</div>
+  </section>
+
+</main>
+
+<footer>
+  Assurance and monitoring only. Aegis does not act on production systems, does not execute
+  MCP servers, and makes no outbound calls. Synthetic data only.
+</footer>
+
+<script id="fixtureData" type="application/json">{{ fixtures | tojson }}</script>
+<script>
+const FIXTURES = JSON.parse(document.getElementById("fixtureData").textContent);
+const $ = (id) => document.getElementById(id);
+
+let currentAgentId = null;
+let currentAssessment = null;
+
+function setStatus(message, isError) {
+  const el = $("status");
+  el.textContent = message;
+  el.className = isError ? "err" : "muted";
+}
+
+async function api(method, path, body) {
+  const options = { method, headers: { "Content-Type": "application/json" } };
+  if (body !== undefined) options.body = JSON.stringify(body);
+  const response = await fetch(path, options);
+  const text = await response.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch (err) { data = { detail: text }; }
+  if (!response.ok) {
+    const detail = data && data.detail ? JSON.stringify(data.detail) : response.statusText;
+    throw new Error(detail);
+  }
+  return data;
+}
+
+function readForm() {
+  let surface;
+  try {
+    surface = JSON.parse($("toolsJson").value || "{}");
+  } catch (err) {
+    throw new Error("Tools JSON is not valid JSON: " + err.message);
+  }
+  return {
+    name: $("name").value.trim(),
+    owner: $("owner").value.trim(),
+    purpose: $("purpose").value.trim(),
+    autonomy: $("autonomy").value,
+    tools: surface.tools || [],
+    mcp_servers: surface.mcp_servers || []
+  };
+}
+
+function readContext() {
+  return {
+    environment: $("environment").value,
+    data_class: $("data_class").value,
+    network: $("network").value,
+    human_gate: $("human_gate").value
+  };
+}
+
+const FIXTURE_CONTEXTS = {
+  clean_dev_agent: { environment: "dev", data_class: "internal", network: "allowlist", human_gate: "in_the_loop" },
+  file_and_network_bridge: { environment: "test", data_class: "internal", network: "allowlist", human_gate: "on_the_loop" },
+  prod_shell_agent: { environment: "prod", data_class: "confidential", network: "allowlist", human_gate: "on_the_loop" },
+  unauth_mcp_network: { environment: "test", data_class: "internal", network: "allowlist", human_gate: "in_the_loop" },
+  drifted_after_approval__v1: { environment: "dev", data_class: "internal", network: "allowlist", human_gate: "in_the_loop" },
+  drifted_after_approval__v2: { environment: "dev", data_class: "internal", network: "allowlist", human_gate: "in_the_loop" }
+};
+
+$("fixture").addEventListener("change", (event) => {
+  const entry = FIXTURES.find((f) => f.key === event.target.value);
+  if (!entry) return;
+  const spec = entry.spec;
+  $("name").value = spec.name || "";
+  $("owner").value = spec.owner || "";
+  $("purpose").value = spec.purpose || "";
+  $("autonomy").value = spec.autonomy || "low";
+  $("toolsJson").value = JSON.stringify(
+    { tools: spec.tools || [], mcp_servers: spec.mcp_servers || [] }, null, 2
+  );
+  const context = FIXTURE_CONTEXTS[entry.key];
+  if (context) {
+    $("environment").value = context.environment;
+    $("data_class").value = context.data_class;
+    $("network").value = context.network;
+    $("human_gate").value = context.human_gate;
+  }
+  currentAgentId = null;
+  setStatus("Loaded fixture " + entry.key + ". Save the agent to register it.");
+});
+
+$("btnSave").addEventListener("click", async () => {
+  try {
+    const saved = await api("POST", "/v1/agents", readForm());
+    currentAgentId = saved.agent_id;
+    setStatus("Saved " + saved.agent_id + " — current digest " + saved.digest.slice(0, 16) + "…");
+  } catch (err) {
+    setStatus("Save failed: " + err.message, true);
+  }
+});
+
+$("btnApprove").addEventListener("click", async () => {
+  if (!currentAgentId) { setStatus("Save the agent before approving.", true); return; }
+  try {
+    const snapshot = await api("POST", "/v1/agents/" + currentAgentId + "/approve");
+    setStatus("Approved snapshot " + snapshot.snapshot_id + " at digest " + snapshot.digest.slice(0, 16) + "…");
+  } catch (err) {
+    setStatus("Approve failed: " + err.message, true);
+  }
+});
+
+$("btnAssess").addEventListener("click", async () => {
+  if (!currentAgentId) { setStatus("Save the agent before assessing.", true); return; }
+  try {
+    const result = await api("POST", "/v1/assess", { agent_id: currentAgentId, context: readContext() });
+    renderResult(result);
+    setStatus("Assessed at " + result.audit.checked_at);
+    await refreshQueue();
+  } catch (err) {
+    setStatus("Assess failed: " + err.message, true);
+  }
+});
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (ch) => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]
+  ));
+}
+
+function renderResult(result) {
+  currentAssessment = result.audit.assessment_id;
+
+  $("verdict").textContent = result.decision;
+  $("verdict").className = "verdict " + result.decision;
+  $("score").textContent = "Score " + result.score + "/100 · " +
+    (result.audit.human_required ? "human sign-off required" : "no human sign-off required") +
+    " · assessment " + result.audit.assessment_id;
+  $("score").className = "score";
+
+  const findings = result.findings || [];
+  $("findings").className = "";
+  $("findings").innerHTML = findings.length
+    ? findings.map((f) => (
+        '<div class="finding ' + f.severity + '">' +
+        '<code>' + escapeHtml(f.code) + '</code> ' +
+        '<span class="tag ' + f.severity + '">' + f.severity + "</span>" +
+        '<div class="detail">' + escapeHtml(f.detail) + "</div></div>"
+      )).join("")
+    : '<p class="muted">No policy findings.</p>';
+
+  const drift = result.drift || {};
+  $("drift").className = "";
+  $("drift").innerHTML = drift.detected
+    ? '<p class="err">Tool surface changed after approval.</p><p>Changed tools: <strong>' +
+      escapeHtml((drift.changed_tools || []).join(", ")) + "</strong></p>" +
+      '<p class="muted">approved ' + escapeHtml(String(drift.approved_digest).slice(0, 16)) +
+      "… → current " + escapeHtml(String(drift.current_digest).slice(0, 16)) + "…</p>"
+    : '<p class="muted">No drift against the approved snapshot' +
+      (drift.approved_digest ? "." : " (this agent has never been approved).") + "</p>";
+
+  const inventory = result.inventory || { tools: [], mcp_servers: [], permissions: [] };
+  $("inventory").className = "";
+  $("inventory").innerHTML =
+    "<table><thead><tr><th>Tool</th><th>Permissions</th></tr></thead><tbody>" +
+    inventory.tools.map((t) =>
+      "<tr><td>" + escapeHtml(t.name) + "</td><td>" +
+      escapeHtml(t.permissions.join(", ") || "(none)") + "</td></tr>").join("") +
+    "</tbody></table>" +
+    "<table><thead><tr><th>MCP server</th><th>Auth</th><th>Tools</th></tr></thead><tbody>" +
+    inventory.mcp_servers.map((s) =>
+      "<tr><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.auth_type) +
+      "</td><td>" + escapeHtml(s.tools.join(", ")) + "</td></tr>").join("") +
+    "</tbody></table>" +
+    '<p class="muted">Permission union: ' +
+    escapeHtml(inventory.permissions.join(", ") || "(none)") + "</p>";
+
+  $("btnEvidence").disabled = false;
+}
+
+$("btnEvidence").addEventListener("click", async () => {
+  if (!currentAssessment) return;
+  try {
+    const pack = await api("GET", "/v1/evidence/" + currentAssessment);
+    $("evidencePreview").hidden = false;
+    $("evidencePreview").open = true;
+    $("evidenceText").textContent = pack.evidence_markdown;
+
+    const blob = new Blob([pack.evidence_markdown], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "aegis-evidence-" + currentAssessment + ".md";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setStatus("Evidence pack downloaded for " + currentAssessment);
+  } catch (err) {
+    setStatus("Evidence failed: " + err.message, true);
+  }
+});
+
+async function refreshQueue() {
+  try {
+    const data = await api("GET", "/v1/queue");
+    const rows = data.queue || [];
+    const target = $("queue");
+    target.className = "";
+    if (!rows.length) {
+      target.innerHTML = '<p class="muted">No assessments yet. Run one in pane 1.</p>';
+      return;
+    }
+    target.innerHTML =
+      "<table><thead><tr><th>Agent</th><th>Context</th><th>Decision</th><th>Score</th>" +
+      "<th>Findings</th><th>Checked</th><th>Recorded</th><th>Action</th></tr></thead><tbody>" +
+      rows.map((row) => {
+        const context = row.context || {};
+        const codes = (row.findings || []).map((f) => f.code).join(", ") || "(none)";
+        return "<tr>" +
+          "<td>" + escapeHtml(row.agent_name) + "<div class='muted'>" +
+            escapeHtml(row.owner || "(no owner)") + "</div></td>" +
+          "<td>" + escapeHtml([context.environment, context.data_class, context.network, context.human_gate].join(" / ")) + "</td>" +
+          "<td><strong class='verdict-cell " + row.decision + "'>" + row.decision + "</strong></td>" +
+          "<td>" + row.score + "</td>" +
+          "<td>" + escapeHtml(codes) + "</td>" +
+          "<td class='muted'>" + escapeHtml(row.checked_at) + "</td>" +
+          "<td>" + escapeHtml(row.last_action ? row.last_action + " by " + (row.last_actor || "") : "—") + "</td>" +
+          "<td><div class='queue-actions'>" +
+            "<button type='button' data-action='accept' data-id='" + row.assessment_id + "'>Accept</button>" +
+            "<button type='button' data-action='reject' data-id='" + row.assessment_id + "'>Reject</button>" +
+            "<button type='button' data-action='override' data-id='" + row.assessment_id + "'>Override</button>" +
+          "</div>" +
+          "<div class='overrideBox' id='ob_" + row.assessment_id + "'>" +
+            "<textarea placeholder='Override reason (minimum 20 characters)'></textarea>" +
+            "<button type='button' data-action='override-submit' data-id='" + row.assessment_id + "'>Submit override</button>" +
+          "</div></td>" +
+        "</tr>";
+      }).join("") + "</tbody></table>";
+  } catch (err) {
+    setStatus("Queue failed: " + err.message, true);
+  }
+}
+
+$("queue").addEventListener("click", async (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const action = button.dataset.action;
+  const assessmentId = button.dataset.id;
+  if (!action || !assessmentId) return;
+
+  if (action === "override") {
+    $("ob_" + assessmentId).classList.toggle("open");
+    return;
+  }
+
+  let payload = { assessment_id: assessmentId, action: action, actor: "ciso" };
+  if (action === "override-submit") {
+    const box = $("ob_" + assessmentId);
+    payload.action = "override";
+    payload.override_reason = box.querySelector("textarea").value;
+  }
+
+  try {
+    await api("POST", "/v1/decisions", payload);
+    setStatus("Recorded " + payload.action + " on " + assessmentId);
+    await refreshQueue();
+  } catch (err) {
+    setStatus("Decision rejected: " + err.message, true);
+  }
+});
+
+$("btnRefresh").addEventListener("click", refreshQueue);
+refreshQueue();
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "repo-summariser",
+  "owner": "developer-tools@example.gov.uk",
+  "purpose": "Summarise a source repository and post the summary to a review service.",
+  "autonomy": "medium",
+  "tools": [
+    {
+      "name": "read_repo",
+      "description": "Read files from the local checkout and POST a summary to the review service.",
+      "permissions": ["read_files", "network"]
+    }
+  ],
+  "mcp_servers": [
+    {
+      "name": "repo-tools",
+      "auth_type": "oauth",
+      "tools": ["read_repo"]
+    }
+  ]
+}
