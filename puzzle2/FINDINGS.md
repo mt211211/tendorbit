@@ -464,3 +464,102 @@ against the published fragment) but they are not complete letterforms.
 The conclusion is now quantitative rather than visual: the column does not
 contain complete characters, and no processing recovers what the window
 removed before encoding.
+
+## The column read, verified two ways
+
+`tools/video/verify_column.py` checks the six characters without relying on
+anyone's eyes.
+
+**Against part 1's own glyphs.** Part 1's seam gives ten complete characters
+whose labels are fixed by `6A6B0860B4`, so the footage supplies in-face,
+in-scale templates for `0`, `4`, `6`, `8`, `A`, `B`. Run against the column:
+
+    cell 5 -> 0  0.517  (next 6 at 0.289)
+    cell 6 -> 4  0.549  (next A at 0.330)
+    cells 1-4 -> nothing above 0.27, top choices unstable
+
+which is exactly the expected signature: the two cells that *are* in that set
+come back correct with a wide margin, and the four that are not (`7`, `2`, `3`,
+`5`) match nothing.
+
+**Against the 16-digit library** from Puzzle #1's solution screen, on tightly
+cropped cells, at three normalisation sizes -- all three agree:
+
+    (32,22) (40,28) (24,17)  ->  7 2 3 5 [0|D] 4
+
+`7` (margin 0.24), `2` (0.24) and `4` (0.38) are decisive; `3` and `5` carry
+thin margins over each other's neighbours but are unambiguous at magnification;
+cell 5 splits `D` 0.63 / `0` 0.60 in the small library and is settled as `0` by
+the part-1 test above and by the glyph itself -- a symmetric closed oval with
+two curved sides, where a `D` in this face has a flat left stem.
+
+**Column = `723504`.**
+
+## Corroboration from the upstream ledger
+
+`floflo777/open-crypto-puzzles`, folder
+`3-small-prizes/crypto-puzzles-2018-puzzle-2-0-05eth`, was read directly
+(2026-08-31). It confirms the frame here and settles two premises:
+
+- The channel has exactly **five** videos: Puzzle #1 statement parts 1 and 2 and
+  its solution reveal, and Puzzle #2 parts 1 and 2. There is no part 3 to find.
+- The escrow `0x1fa8Be9De5bBFE047C72dB8E8E3257128F7661ad` was **funded and
+  unspent, nonce 0** as of 2026-08-16, funded by the same wallet that funded
+  Puzzle #1's escrow, for the same 0.05 ETH, five days before Puzzle #2 was
+  posted. The oracle's target is right.
+
+Its own census, taken at 360p30 (the only rendition it could fetch), is **2 of
+64** -- `C` and `8`. The "about 40 to 50 of 64 hex characters legible" line in
+its README is explicitly marked as not reproduced by its own later ledger. Its
+row 7 concludes the payload glyphs do *not* wrap the frame edge; at 720p60 they
+demonstrably do, which is what yields `6A6B0860B4` twice over. So the reading
+here (18) supersedes both upstream numbers.
+
+## Searches run to exhaustion against these two files
+
+Every one of these returned nothing beyond the 18 characters already read:
+
+- **Temporal max and min projection** over all 1800 frames of each video (the
+  upstream's stated technique): superimposes the ten seam glyphs at one spot,
+  adds nothing.
+- **Transient-layer detector**: 90 windows of 20 frames per video, each window's
+  mean minus the median of all window means, scored for glyph-shaped
+  components. The only windows that stand out in part 1 are its last 60 frames,
+  which resolve to the title ghosting back in.
+- **Tile-wise adaptive stretch** (48px tiles) on the spatial high-pass of deep
+  window means -- the detector calibrated on Puzzle #1's low-opacity terminal
+  layer, where it renders those glyphs plainly. Applied to every scene window of
+  both videos, and to part 2's 180-frame black tail: photograph, geometric
+  overlays, background texture, nothing else.
+- **Chroma**: U and V channel means over the payload windows show only 4:2:0
+  subsampling artefacts around the luma glyphs.
+- **Temporal frequency**: per-pixel amplitude at periods 2, 3, 4, 6 and 10
+  frames. Part 2 and Puzzle #1's statement A give the same profile (a period-3
+  bump, the 20fps source cadence rendered at 60fps); no structured carrier.
+- **Spatial frequency**: 2-D FFT of the static-block deep mean has no
+  high-frequency peaks, only the vignette and panel structure.
+- **Container**: the two direct-from-YouTube mp4s carry no `udta`, `meta` or
+  text tracks -- no metadata payload.
+- **The early flashing bursts** in part 1 (frames 11-173, eight 7-frame bursts):
+  identical bounding box and ink to within 1%; they are the title blinking, not
+  characters.
+- **The "static decoy"**: the right-edge object from frame 1262 to 1372 is one
+  `4` fading monotonically -- the last character of the parade held on screen.
+- **Derivations from Puzzle #1's key**: 10,017 candidates (±5000 additive, XOR
+  with repeated fragments, byte/hex reversal, complement, SHA-256/SHA-3/Keccak/
+  SHA-512 over bytes and both hex casings). No match.
+- **Constructions from the 18 read characters**: 512 orderings and paddings
+  (each fragment forward and reversed, all orders, zero/F padding left, right
+  and centred, cyclic repetition). No match.
+
+Both puzzle-2 videos were re-confirmed to be the highest-bitrate renditions
+available here (1324 and 1351 kb/s, h264 Main), not the 469/419 kb/s itag-311
+streams; the three renditions of part 1 give byte-identical parade timing.
+
+## Egress
+
+`youtube.com`, `googlevideo.com`, `archive.org` and `web.archive.org` are
+refused by this session's egress policy (CONNECT 403), as are public Ethereum
+RPC endpoints. `github.com` is allowed, which is how the upstream ledger was
+read. Fetching a better rendition, or checking the escrow on-chain, has to
+happen outside this session.
