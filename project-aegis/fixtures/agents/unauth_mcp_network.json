@@ -1,0 +1,20 @@
+{
+  "name": "ticket-triage-agent",
+  "owner": "servicedesk@example.gov.uk",
+  "purpose": "Fetch and triage service desk tickets from a community MCP server.",
+  "autonomy": "low",
+  "tools": [
+    {
+      "name": "fetch_tickets",
+      "description": "Call the ticket API over HTTPS and return open tickets.",
+      "permissions": ["network"]
+    }
+  ],
+  "mcp_servers": [
+    {
+      "name": "community-tickets",
+      "auth_type": "none",
+      "tools": ["fetch_tickets"]
+    }
+  ]
+}

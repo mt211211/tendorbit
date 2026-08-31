@@ -1,0 +1,145 @@
+/* Project Aegis — deliberately plain. White background, black text, yellow focus. */
+
+:root {
+  --line: #111;
+  --muted: #555;
+  --rule: #ccc;
+  --focus: #ffd400;
+  --block: #b00020;
+  --review: #7a5b00;
+  --ok: #0a6b2d;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #fff;
+  color: #000;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+header {
+  border-bottom: 3px solid var(--line);
+  padding: 12px 16px;
+}
+
+header h1 { font-size: 18px; margin: 0 0 4px; }
+header p { margin: 0; color: var(--muted); font-size: 12px; }
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+section {
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 12px 16px;
+  min-width: 0;
+}
+
+section#pane-queue { grid-column: 1 / -1; border-right: none; }
+
+h2 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 10px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--rule);
+}
+
+label { display: block; margin: 8px 0 2px; font-size: 12px; color: var(--muted); }
+
+input, select, textarea, button {
+  font-family: inherit;
+  font-size: 13px;
+  color: #000;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 5px 6px;
+  width: 100%;
+}
+
+textarea { min-height: 190px; white-space: pre; overflow-x: auto; }
+
+input:focus, select:focus, textarea:focus, button:focus {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+
+.buttons { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.buttons button { width: auto; cursor: pointer; padding: 7px 12px; font-weight: bold; }
+.buttons button:hover { background: var(--focus); }
+
+.verdict {
+  font-size: 34px;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+  margin: 6px 0 2px;
+  word-break: break-word;
+}
+.verdict.ACCEPTABLE { color: var(--ok); }
+.verdict.CONDITIONAL { color: var(--review); }
+.verdict.UNACCEPTABLE { color: var(--block); }
+
+.score { font-size: 16px; margin-bottom: 10px; }
+
+.finding {
+  border-left: 6px solid var(--rule);
+  padding: 5px 0 5px 9px;
+  margin-bottom: 8px;
+}
+.finding.block { border-left-color: var(--block); }
+.finding.review { border-left-color: var(--review); }
+.finding code { font-weight: bold; }
+.finding .detail { color: var(--muted); font-size: 12px; }
+
+.tag {
+  display: inline-block;
+  border: 1px solid var(--line);
+  padding: 0 5px;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.tag.block { background: var(--block); color: #fff; border-color: var(--block); }
+.tag.review { background: var(--focus); }
+
+table { border-collapse: collapse; width: 100%; font-size: 12px; }
+th, td { border: 1px solid var(--rule); padding: 4px 6px; text-align: left; vertical-align: top; }
+th { background: #f2f2f2; }
+
+.muted { color: var(--muted); font-size: 12px; }
+.hint { color: var(--muted); font-size: 11px; margin: 2px 0 0; }
+.err { color: var(--block); font-weight: bold; }
+
+#status { margin-top: 10px; font-size: 12px; min-height: 1.4em; }
+
+.queue-actions { display: flex; gap: 4px; flex-wrap: wrap; }
+.queue-actions button { width: auto; padding: 3px 7px; cursor: pointer; font-size: 11px; }
+.queue-actions button:hover { background: var(--focus); }
+
+.overrideBox { display: none; margin-top: 4px; }
+.overrideBox.open { display: block; }
+.overrideBox textarea { min-height: 52px; white-space: normal; }
+
+details { margin-top: 12px; }
+summary { cursor: pointer; font-size: 12px; }
+
+footer { padding: 10px 16px; color: var(--muted); font-size: 11px; }
+
+@media (max-width: 900px) {
+  main { grid-template-columns: 1fr; }
+  section { border-right: none; }
+}
+
+.verdict-cell.ACCEPTABLE { color: var(--ok); }
+.verdict-cell.CONDITIONAL { color: var(--review); }
+.verdict-cell.UNACCEPTABLE { color: var(--block); }

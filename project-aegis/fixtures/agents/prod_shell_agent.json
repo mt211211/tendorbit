@@ -1,0 +1,20 @@
+{
+  "name": "prod-runbook-agent",
+  "owner": "sre@example.gov.uk",
+  "purpose": "Execute runbook steps against production hosts on operator request.",
+  "autonomy": "medium",
+  "tools": [
+    {
+      "name": "run_cmd",
+      "description": "Execute a shell command on the target host and return stdout.",
+      "permissions": ["shell"]
+    }
+  ],
+  "mcp_servers": [
+    {
+      "name": "runbook-exec",
+      "auth_type": "oauth",
+      "tools": ["run_cmd"]
+    }
+  ]
+}
