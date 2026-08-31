@@ -335,3 +335,39 @@ Layer X's components do not touch the window edges, but rendering them shows
 crescents and hooks rather than characters: X is one layer of a glyph whose
 full extent is the overlay Y, and Y is cut at x617-664. The column stays
 unreadable.
+
+## A calibrated test for glyph completeness
+
+The strongest evidence in this folder, because it is calibrated against known
+complete glyphs in the payload's own display face.
+
+Four complete display-font glyphs are available: the `8` and `C` of part 2's
+static block (un-mirrored), and the large `1` and `2` of the "PART 1" and
+"PUZZLE 2" title cards. Matched against the 16-digit library built from Puzzle
+#1's solution screen, each is identified correctly and confidently:
+
+| glyph | best match | score | margin |
+|---|---|---|---|
+| static-block `8` | `8` | 0.867 | 0.365 |
+| static-block `C` | `C` | 0.901 | 0.357 |
+| title `1` | `1` | 0.907 | 0.488 |
+| title `2` | `2` | 0.787 | 0.431 |
+
+So a complete glyph of this face scores **0.79 to 0.91** against this library,
+with a wide margin, despite the library being built from a lighter weight.
+
+Every character of part 2's column, in all three states (X, Z and the overlay
+Y), split on ink-profile valleys, tested both mirrored and not, scores at most
+**0.672** and typically 0.2 to 0.5. Not one reaches the range that complete
+glyphs occupy.
+
+This also corrected an error: templates built from part 1's seam glyphs are
+themselves cut -- rendering them shows `0` as a bare arch, `A` as a bare V and
+`B` as a D-shape. They were unusable as templates, which is why earlier
+same-font matching attempts scored poorly. The seam glyphs remain *identifiable*
+(a partial `6` still reads as `6`, which is why seam A's `6A6B0860B4` reproduces
+against the published fragment) but they are not complete letterforms.
+
+The conclusion is now quantitative rather than visual: the column does not
+contain complete characters, and no processing recovers what the window
+removed before encoding.
