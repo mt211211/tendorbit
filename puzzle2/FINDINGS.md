@@ -317,3 +317,21 @@ carry enough shape to identify, even with a same-font reference.
 | Part 2 static block | 2 | **2** (`C`, `8`) | complete |
 | Part 2 column | ~14 | 0 | hard-cut 43px window, both sides |
 | **Total** | **~35** | **12** | |
+
+## Final exhaustion of hypotheses
+
+Additional avenues tested this round, all negative: mp4 container metadata and
+embedded strings; LSB and bit-plane analysis (bit-plane row correlation
+0.51-0.74, i.e. ordinary compressed video, no hidden data); the central window
+across all 1800 frames of both videos (part 2's late activity at frames
+1620-1798 is the bright smoke plume, not glyphs); part 1's unexamined
+vertical-wrap periods 1280-1400 (one state, no characters); 16 derivations of
+Puzzle #1's key (reversal, byte-reversal, increment, complement, XOR, single
+and double hashing, nibble swap, half swap); and 552 hash-of-seed candidates
+over video IDs, channel id, escrow address and puzzle strings across five hash
+functions.
+
+Layer X's components do not touch the window edges, but rendering them shows
+crescents and hooks rather than characters: X is one layer of a glyph whose
+full extent is the overlay Y, and Y is cut at x617-664. The column stays
+unreadable.
