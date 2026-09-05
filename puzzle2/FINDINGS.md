@@ -679,3 +679,62 @@ payload" reading to the point of not being worth pursuing on its own. Both are
 common misspellings and the author's prose is informal throughout. Recorded, not
 relied on. Puzzle #1's two descriptions would settle it as a control: if they
 are clean, the typos here are deliberate.
+
+## The author's concealment device: single-frame flashes
+
+The Puzzle #1 control was re-run frame by frame instead of by window average, and
+it changes the picture of how this author hides characters.
+
+**Statement A, frame 1181, is a single-frame flash.** Against a reference of
+`0.5 * (frame 1171 + frame 1191)` its high-pass peaks at **167**, where every
+neighbouring frame sits at 8-10. One frame at 60fps -- 1/60 of a second. Every
+earlier pass here averaged 20 frames around it and diluted it twentyfold, which
+is why it read as a vague "low-opacity terminal layer".
+
+Isolated properly, that one frame carries:
+
+- a **rotated column** down the centre of the frame, glyphs ~15px, which
+  rotated upright and read reversed gives `451007322EA` -- Puzzle #1's
+  positions 48-58;
+- **large scattered glyphs** mirrored about the horizontal centreline, forming
+  converging arcs: `B 9 C 2 4` on the left, `0 0 1 5` on the right, repeated
+  below the mirror line. Those belong to the `BE6FB9C24510` span that neither
+  statement's static composition contains.
+
+**Statement B has four flashes**, at frames 1025, 1040, 1054 and 1181, peaks
+179-190. Frame 1040 carries a **third row of six characters** above the two
+static rows -- content not in the static composition at all.
+
+So the author does publish every character, but some of them only in a frame
+that is on screen for 1/60 second. That is the device, and it is the reason
+Puzzle #1 is fully readable from its two videos while a window-averaged pass
+concludes otherwise.
+
+## Puzzle #2 has no flash frames
+
+The detector was calibrated on the control (statement A frame 1181 ranks first
+in its own video, isolation ratio 34, peak 184) and then run over **all three
+renditions of each Puzzle #2 video** -- the 1324/1351 kb/s pair, the itag-311
+pair, and the direct-fetch pair -- listing every frame whose isolated deviation
+exceeds 120.
+
+The result is identical in all six files:
+
+| Event | Frames | Peak | What it is |
+|---|---|---|---|
+| Title template | 17, 46, 135, 138, 145, 174 | 137-179 | shared by all five videos in the series, Puzzle #1 included, at the same frame numbers |
+| Part 1 seam A | 1220-1260 (multi-frame runs) | 222-232 | known payload |
+| Part 1 decoy | 1282-1286, 1301-1305, 1517-1521, 1536-1540 | 150-167 | the fading `4` at the left and right frame edges, isolated and confirmed |
+| Part 1 seam B | 1455-1495 (multi-frame runs) | 195-220 | known payload |
+| Part 2 column | 1556-1613 (multi-frame runs) | 217-228 | known payload |
+
+**No single-frame flash exists anywhere in either Puzzle #2 video.** Every
+non-title event is a multi-frame run coinciding exactly with a payload window
+already read. Checked directly at the control's own flash frame numbers
+(1025, 1040, 1054, 1181) and at the proportional position (1772 of 1800): the
+Puzzle #2 videos measure 8-22 there, against the control's 184-190 -- compression
+noise, not a flash.
+
+This is the strongest form the negative can take. The author's hidden channel has
+been found, proven to carry the missing characters in the puzzle that *is*
+solved, and shown to be absent from the one that is not.
