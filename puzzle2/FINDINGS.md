@@ -1047,3 +1047,19 @@ letters. **Nothing else exists in either file** at a third of a gray level with
 the background removed exactly rather than approximately.
 
 The census is 18 of 64 and it is now measured, not inferred.
+
+### The column has exactly three states, confirmed at the new noise floor
+
+The original clustering ran at correlation >0.97 on the blank-frame residual,
+whose off-column noise is std 24.7 -- loose enough that genuinely distinct
+states could have merged. Re-clustered on the h1-referenced difference (noise
+std 1.5) at correlation **>0.995**, frames 1541-1630 resolve into exactly three
+content states:
+
+    ink 9374   frames 1551-1559, 1576-1582, 1599-1603   (state A, right parts)
+    ink 8690   frames 1566-1573, 1589-1594, 1610-1619   (state C, left parts)
+    ink 13752  the crossfade frames                      (their union)
+
+Every other cluster is an ink-zero blank frame split by noise. There is no
+fourth layer hiding under the old threshold. The column is two half-streams of
+six characters, as read.
