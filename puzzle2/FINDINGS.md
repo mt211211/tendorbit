@@ -788,3 +788,41 @@ title template at 17, 46, 135, 138, 145, 174, and one run at 429-470 (the SOLVED
 card appearing). No isolated payload flash, which fits: that video publishes the
 key openly and has nothing to hide. Flashes are a statement-video device, and
 Puzzle #2's two statements have none.
+
+## Channel banner and avatar, examined
+
+Both were recovered at full size and put through the detector calibrated on
+Puzzle #1's low-opacity terminal layer.
+
+**Avatar** (1440x1440, lossless PNG). A generic stock "bookmark with a question
+mark" graphic on the channel's navy. Not a carrier:
+
+- PNG chunk dump: `IHDR`, `sBIT`, `iCCP`, `zTXt`, `IDAT`, `IEND`. The `zTXt`
+  chunk is ImageMagick's "Raw profile type APP1" wrapper; decompressed and
+  un-hexed it is a 34-byte TIFF header whose single tag is
+  **`Software: Picasa`**. No comment, no payload.
+- Bit-plane occupancy is 0.77/0.77/0.78 for the three LSBs with row-correlation
+  0.76 -- smooth gradient banding, not the ~0.50 uncorrelated plane that LSB
+  stego produces.
+- Spatial high-pass shows the bookmark outline, the question mark, and gradient
+  dither. Nothing else.
+
+**Banner** (2000x1125). Carries the same 13 branding glyphs and nothing else.
+
+- 245 glyph-sized components at 4 sigma, but scattered across the smoke texture
+  at every size with **no row structure** -- no set sharing a baseline at a
+  regular pitch. Texture, not text.
+- Edge bands (60px, all four sides) carry only cloud gradient.
+- **Its background is not the video plate.** Registering it against Puzzle #1's
+  statement A and both Puzzle #2 videos by normalised cross-correlation over a
+  scale sweep gives 0.072-0.101 on the high-pass and 0.45-0.48 on coarse
+  downscales -- the signature of a different photograph in the same duotone
+  house style, not the >0.9 a shared plate would give. So the banner is not a
+  wider view of the video composition, and the video's edge-clipped glyphs do
+  not appear in it.
+
+One caveat worth stating: the banner reached this session as a 24 KB lossy
+re-encode of a 2000x1125 image. Blocking artefacts dominate its high-pass, so a
+low-amplitude layer would not have survived. The original CDN JPEG, attached as
+a file rather than pasted, would be worth a re-run; the avatar needs no re-run
+because its PNG was lossless.
