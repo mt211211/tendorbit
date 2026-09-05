@@ -1010,3 +1010,40 @@ Two further blind spots checked and closed:
   least 10-12px. A dedicated scan for rows of 16+ components in the 4-12px range,
   over the tile-stretched deep mean of every scene window of both videos, returns
   zero rows.
+
+## The definitive census, with the background exactly cancelled
+
+Using each video as the other's background reference removes the moving cloud
+plate exactly. Measured off-column, the residual falls from **std 24.7** under
+the blank-frame subtraction used everywhere above to **std 1.5** -- a 16-fold
+improvement -- and deep-averaging each window drives the noise floor to
+0.29-0.90 gray levels. At that sensitivity, every window of both videos:
+
+**Part 1** (h2 as reference)
+
+| frames | sigma | glyph components | what they are |
+|---|---|---|---|
+| 300-720 | 0.32 | **0** | -- |
+| 760-1160 | 0.29 | 5 | "PART 1" title letters, y350 |
+| 1220-1260 | 0.82 | **2** | seam A, x0 and x1214 |
+| 1260-1380 | 0.64 | 5 | the decoy holding at the edges |
+| 1380-1452 | 0.70 | **0** | -- |
+| 1455-1500 | 0.90 | **2** | seam B, y0 x580 and y650 x583 |
+| 1500-1615 | 0.64 | 6 | the decoy holding |
+| 1615-1705 | 0.72 | **0** | -- |
+
+**Part 2** (h1 as reference)
+
+| frames | sigma | glyph components | what they are |
+|---|---|---|---|
+| 300-720 | 0.32 | **0** | -- |
+| 760-1160 | 0.29 | 6 | title row, y350 |
+| 1300-1500 | 0.55 | 8 | the `8` and `C` at y225, six MIRROR letters at y425 |
+| 1551-1574 | ~1.1 | 3-5 | the column, merged |
+| 1620-1705 | 0.76 | **0** | -- |
+
+Two glyphs at each seam, the decoy, the static pair, MIRROR, the column, title
+letters. **Nothing else exists in either file** at a third of a gray level with
+the background removed exactly rather than approximately.
+
+The census is 18 of 64 and it is now measured, not inferred.
