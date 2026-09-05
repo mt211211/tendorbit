@@ -747,3 +747,44 @@ on the edge of a glyph already accounted for -- h2 frame 1361's extreme sits at
 (447, 1023), which is the `I` of the MIRROR row; h2 frame 497 and h1 frame 1160
 likewise land on title letters. The 12-frame runs near frames 717-736 in both
 videos are the title scene change, not a flash.
+
+## The parade's repeat structure confirms the fragment combinatorially
+
+Censusing the four edge streams for *distinct images* (Jaccard > 0.985 between
+frames) rather than reading them gives an independent check that needs no
+template library at all.
+
+The right edge of seam A holds **six** distinct images across frames 1220-1265,
+with multiplicities:
+
+    3x  frames 1220,1221 / 1225,1226 / 1235,1236
+    1x  frames 1222-1224
+    2x  frames 1227-1229 / 1240,1241
+    2x  frames 1230,1231 / 1237-1239
+    1x  frames 1232-1234
+    -   frames 1242+ (the decoy, held)
+
+That is the multiplicity profile 3,1,2,2,1,1 in the order
+`A B C D E F -> A B A C D E A D C F`. `6A6B0860B4` has exactly that profile:
+`6` three times at positions 1,3,7; `0` twice at 5,8; `B` twice at 4,9; `A`, `8`
+and `4` once each. A random ten-character string reproduces both the repeat
+pattern *and* the reading by coincidence only rarely, so this is a genuine
+independent confirmation of the fragment.
+
+All four streams agree. The left edge shows the same six images with the same
+multiplicities, shifted **exactly +19 frames** ({1220,1225,1235} -> {1239,1244,
+1254}; {1227,1240} -> {1246,1259}; {1230,1237} -> {1249,1256}), and seam B's top
+and bottom pair the same way. Four streams, one string of ten, confirmed without
+classifying a single glyph.
+
+It also closes the parade as a hiding place: six distinct images exist and no
+more, so there is no eleventh character concealed between the held states.
+
+## The solution video has no flash either
+
+`0jJ6XadOAWk` is 1800 frames -- the same length as both Puzzle #2 videos -- so it
+shows where this author places events on that timeline. Scanned: the shared
+title template at 17, 46, 135, 138, 145, 174, and one run at 429-470 (the SOLVED
+card appearing). No isolated payload flash, which fits: that video publishes the
+key openly and has nothing to hide. Flashes are a statement-video device, and
+Puzzle #2's two statements have none.
