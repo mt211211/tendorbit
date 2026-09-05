@@ -923,3 +923,44 @@ gap is now closed:
 - The first and last frames of every video, which a two-sided detector can never
   test, carry no content either (frame 0 vs frame 3, and last vs last-3: zero
   pixels above 25 in all four videos).
+
+### The control, fully closed
+
+Statement A's flash column reads, bottom-up at magnification, all 22 characters
+without ambiguity:
+
+    4 8 2 B E 6 F B 9 C 2 4 5 1 0 0 7 3 2 2 E A
+
+against the published answer's positions 37-58:
+
+    ...A3DC 482BE6FB9C2451007322EA 8BE35F
+             ^^^^^^^^^^^^^^^^^^^^^^
+
+An exact 22-character match. Puzzle #1 is therefore accounted for end to end:
+
+| carrier | positions |
+|---|---|
+| statement A, static line | 1-39 |
+| statement A, flash at frame 1181 | 37-58 |
+| statement B, static block | 52-63 |
+
+The control has exactly **five** flashes in total -- statement A at 1181, and
+statement B at 1025, 1040, 1054 and 1181 -- found at an amplitude threshold of 6
+gray levels, so the set is complete rather than a sampling.
+
+### What this settles about Puzzle #2
+
+The detector that recovers 22 consecutive correct characters from a sixtieth of
+a second returns **nothing** on Puzzle #2, across every variant:
+
+| variant | part 1 | part 2 |
+|---|---|---|
+| +-1 baseline, bright | seam transitions only | zero |
+| +-4 / +-8 / +-16 baseline, row-structured | outro fade only | zero, zero, zero |
+| dark novelty | title blinks only | title blinks only |
+| chroma novelty | title blinks only | title blinks only |
+| first/last frames | clean | clean |
+
+Every carrier class the author is demonstrably known to use is now tested
+against a ground-truth positive control, and Puzzle #2 uses none of them beyond
+the two seams, the static block and the column. The census stands at 18 of 64.
