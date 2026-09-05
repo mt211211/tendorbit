@@ -890,3 +890,36 @@ Puzzle #2 videos:
 This was the last carrier class that could have hidden characters from every
 method used so far, precisely because it defeats all of them. It is not present
 in Puzzle #2. The census stands at 18.
+
+### The flash grid's extra rows are decoys, rigorously
+
+Statement B's flash rows 1-3 look like 18 more key characters. They are not.
+Taking the cleanest instance -- the frame-1040 flash, where row 3 is bright and
+isolated -- classifying each of its six glyphs and enumerating **all 3^6 = 729
+combinations of the top-3 candidates per position**, in both the upright and
+mirrored orientation, forward and reversed:
+
+    id    4/0/A  0/C/6  0/9/6  8/B/9  7/F/C  4/1/A   -> key substrings: NONE
+    mirx  F/E/C  9/D/0  0/D/9  D/B/F  4/1/A  F/E/C   -> key substrings: NONE
+
+Not one of those 2916 readings is a substring of the published answer. The key
+also contains no `F????F` at all, which the mirrored reading requires. So the
+author plants **decoy characters inside flashes** -- the same trick as Puzzle
+#2 part 1's static decoy digit, moved into the flash channel. Any flash found in
+future must be checked against a constraint, not trusted.
+
+### The wide-baseline follow-up
+
+A +-1 neighbour comparison cancels any event lasting 2-3 frames, and Puzzle #2's
+source cadence is 20-24fps rendered at 60 (the period-3 bump in its temporal
+frequency profile), so one source frame occupies 2-3 video frames there. That
+gap is now closed:
+
+- **Part 2, baselines +-4, +-8 and +-16, requiring 4+ glyph components sharing a
+  baseline: empty at every one.**
+- Part 1 at +-4 flags frames 1714-1717 with 78/76/67/57 components -- which
+  resolve to the outro fade-to-black, the whole background plate crossing the
+  threshold at once, not glyphs.
+- The first and last frames of every video, which a two-sided detector can never
+  test, carry no content either (frame 0 vs frame 3, and last vs last-3: zero
+  pixels above 25 in all four videos).
