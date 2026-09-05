@@ -1063,3 +1063,53 @@ content states:
 Every other cluster is an ink-zero blank frame split by noise. There is no
 fourth layer hiding under the old threshold. The column is two half-streams of
 six characters, as read.
+
+## Independent corroboration: three separate counts converge, and the likely reason
+
+`itsnex1s/crypto-puzzle-list`, file `unsolved/crypto-puzzles-2018-puzzle-2-0-05eth.md`,
+carries a deep re-analysis done independently of this work and of the upstream
+folder. Read 2026-09-05. It reaches the same measurement from different methods:
+
+- **"roughly 14-16 distinct hex characters total, not 64."** Two independent
+  counting methods, converging. This work finds 18.
+- **The upstream "40-50 of 64" figure is a counting artefact.** Counting glyph
+  *states* at the seam -- the fade-in and fade-out frames of the same dozen
+  characters -- yields 50 and 53, which collapse to about 12 real characters when
+  rendered in order. That is exactly the failure mode the ten-state parade here
+  produces if states are counted instead of characters.
+- **A third party reached the same order of magnitude.** An independent solver
+  left a public comment on the videos in 2025 saying "I have 16 hex", before
+  asking the author for "the next part".
+- Steganography, audio, colour, metadata, LSB, frame-timing **and thumbnails**
+  all checked and negative.
+
+It also supplies a fact this work did not have, and it matters:
+
+> **Puzzle #2 part 2 was posted 2018-08-27 -- three weeks after part 1
+> (2018-08-06) -- and the channel has published nothing since.**
+
+Puzzle #1 ran statement part 1 (2018-07-25), part 2 (2018-07-26) and its
+solution (2018-08-01) inside a week and paid out; its escrow was swept at
+14:03:08 UTC on 2018-07-26, about seven hours after its second video. Puzzle #2's
+second video came three weeks late and was the channel's last upload. Its
+conclusion, which the evidence here supports: the author **finished Puzzle #1
+properly and then appears to have abandoned Puzzle #2 mid-publication**, so the
+remaining characters were probably never released at all.
+
+### Where this work goes further
+
+That dossier concludes "the alternating slit in part 2 is not text", on the
+grounds that it produces nothing above noise against a control margin when
+matched at the slit's own 36px width. That conclusion is superseded here. The
+slit is not one clipped string but **two complementary half-streams**: state A
+carries each glyph's right part cut at x=622, state C the left part cut at
+x=663, the two cuts fall at the same point within the glyph (their cut columns
+agree at Jaccard 0.93, a sharp peak at -1px), and `hstack(C, A)` rejoins them
+into six complete characters reading **`723504`** -- confirmed against part 1's
+own in-footage glyphs (cells 5 and 6 return `0` at 0.517 and `4` at 0.549, while
+cells 1-4 correctly match nothing in that six-glyph set) and stable across three
+normalisation sizes. Matching the halves separately, as that analysis did, is
+precisely what makes them look like noise.
+
+So the current best public read is the 18 here -- 10 from the seams, `C8` from
+the static block, and the six the slit was thought not to contain.
