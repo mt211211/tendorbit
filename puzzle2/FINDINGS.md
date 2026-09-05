@@ -608,3 +608,74 @@ problem.
   is broadband 500-6000 Hz with a smooth envelope, no discrete tones, nothing
   above 16 kHz, at -53 dB relative to signal: a codec quantisation difference at
   a musical transient.
+
+## The author's own reading rule, from the channel branding
+
+The channel banner and both videos' title scene carry the same 13 glyphs in the
+same scattered layout:
+
+    row 1  (y178)          C        R        Y
+    row 2  high (y327)          P        T        O
+    row 2  low  (y361)     P        U        Z        Z
+    row 3  (y508)          L        E        R
+
+Read in raster order that is `CRYPPUTZOZLER` -- a jumble. Separated by
+**baseline** it is exact:
+
+    row 1 + row 2 high  ->  CRY + PTO   = CRYPTO
+    row 2 low + row 3   ->  PUZZ + LER  = PUZZLER
+
+So the author's own branding states the grammar: **glyphs sharing a layout but
+sitting on two baselines are two interleaved strings, and must be separated by
+baseline before reading.** This is worth having explicitly, because it is the
+rule that makes both of Puzzle #2's payload carriers make sense -- part 1's two
+edge streams and part 2's two column layers are the same idea moved into time.
+
+Applied to every payload element, it adds nothing further:
+
+- **Part 1's ten seam glyphs sit on one baseline.** Measured on the composites:
+  bottoms at 126-130 (seam A) and 108-112 (seam B), the spread being the face's
+  overshoot -- round `0`/`6`/`8` reach 130, flat `A`/`B`/`4` stop at 126. One
+  string of ten, not two of five.
+- **Part 2's two static characters share a baseline and a cap height.** On the
+  deep-mean high-pass both `8` (x386) and the mirrored `C` (x823) measure
+  top 240, bottom 333, h93. (An earlier h121 for the `C` came from the max-minus-
+  min census merging it with an overlay line.)
+- **The column's two states do not read independently.** If they were two
+  condensed strings rather than two halves of one, each would classify on its
+  own. Neither does: state C alone gives `522FC0` at 0.05-0.42 with margins
+  under 0.1, state A alone `77A51F` at 0.11-0.48, against the joined `723504`
+  whose decisive cells score 0.63 and 0.75. Aspect normalisation makes the
+  result stretch-invariant, so a condensed-render reading is excluded too.
+
+## The channel banner is an untested carrier
+
+The banner is the same 13-glyph device, but **its letter spacing is not the
+video's**: in the video the three top letters sit at x439/629/818, evenly spaced
+190px apart; in the banner as displayed they are visibly unevenly spaced. It is
+a different arrangement of the same device, not a still of the title scene.
+
+That matters because a YouTube banner is stored at 2560x1440 and most surfaces
+display only a wide central strip of it. The cropped-away area is roughly four
+fifths of the image -- and hiding payload in the part of a frame that normal
+viewing discards is exactly this author's method in both videos.
+
+The banner at display resolution shows nothing beyond the 13 letters. The
+full-resolution asset has not been examined; `yt3.googleusercontent.com`,
+`yt3.ggpht.com`, `i.ytimg.com` and `lh3.googleusercontent.com` are all refused
+by this session's egress policy, so it cannot be fetched here.
+
+## Video descriptions
+
+    part 1: "Do you have the intellience to solve the Crypto Puzzle? 0.05ETH is
+             waiting for the best puzzler solver. Is it you?"
+    part 2: "The first puzzle was solved in hours, so our second is decidely
+             trickier.  Are you smart enough?"
+
+Two misspellings, each a single dropped letter -- `intelligence` -> `intellience`
+(drops `g`), `decidedly` -> `decidely` (drops `d`) -- plus a double space after
+"trickier.". `g` is not a hex digit, which weakens a "the dropped letters are
+payload" reading to the point of not being worth pursuing on its own. Both are
+common misspellings and the author's prose is informal throughout. Recorded, not
+relied on. Puzzle #1's two descriptions would settle it as a control: if they
+are clean, the typos here are deliberate.
