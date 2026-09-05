@@ -826,3 +826,67 @@ re-encode of a 2000x1125 image. Blocking artefacts dominate its high-pass, so a
 low-amplitude layer would not have survived. The original CDN JPEG, attached as
 a file rather than pasted, would be worth a re-run; the avatar needs no re-run
 because its PNG was lossless.
+
+## The mechanism I had been missing: single-frame flashes
+
+Puzzle #1 hides part of its key in frames that are on screen for **one frame at
+60 fps**. Sampling a pixel through such a flash makes it unmistakable -- here is
+a glyph position in statement B across frames 1048-1061:
+
+    52 53 52 53 53 53 [241] 53 53 53 53 55 53 55
+
+One frame at 241, the rest at 53. A sixtieth of a second, invisible in playback,
+and **destroyed by every averaging method used up to this point** -- temporal
+median, temporal mean, max projection, background subtraction, deep-window
+averaging. A whole session's worth of detectors can miss it because they are all
+designed to suppress exactly this.
+
+`tools/video/flash_scan.py` finds it. A frame's *novelty* is its departure from
+the mean of its two neighbours, measured only over pixels that are not routinely
+bright, scored by how many glyph-shaped components that novelty contains.
+Calibrated on Puzzle #1:
+
+| video | frame | glyph components | amplitude |
+|---|---|---|---|
+| statement A | 1181 | 18 | 182 |
+| statement B | 1054 | 21 | 200 |
+| statement B | 1040 | 9 | 199 |
+| statement B | 1025 | -- | 190 |
+
+**Statement A's flash is the missing span.** Its content is a 90-degree-rotated
+column of small glyphs; read bottom-up it is unambiguous at magnification:
+
+    4 8 2 B E 6 F B 9 C 2 ...
+
+-- positions **37-47** of the published answer `...A3DC482BE6FB9C2451007322EA...`,
+precisely the stretch that statement A's static line (positions 1-39) and
+statement B's static block (52-63) leave out. This closes the Puzzle #1 control
+completely: the static compositions carry 51 of 64 characters, and the
+one-frame flashes carry the bridge.
+
+Statement B's flash at 1054 is a **6x5 grid of mirrored glyphs**, 30 characters.
+Its bottom two rows are the static block already read (`07322E`, `A8BE35` =
+positions 52-63). Its top three rows do **not** appear in the key in any
+orientation or reading order -- the key contains no `F????F` substring at all,
+while row 3 reads `F5084F` / `F4805F`. Those eighteen are decoys, which is
+consistent with the author's use of a static decoy digit in Puzzle #2 part 1.
+
+### Puzzle #2 has no flashes
+
+The same detector, with four true positives on the control, applied to both
+Puzzle #2 videos:
+
+- **Part 2: zero.** Not one glyph-shaped single-frame event anywhere in 1800
+  frames, at a threshold of 8 gray levels.
+- **Part 1: nothing beyond the seams.** Its only hits are frames 1234, 1241,
+  1475, 1476 -- inside the seam windows, where the payload glyph legitimately
+  changes every 2-3 frames. Restricted to the quiet ranges (300-1215,
+  1380-1452, 1615-1797) the detector returns **zero pixels above threshold**.
+  The events at frames 1301/1303 and 1517/1519, which stood out before masking,
+  resolve to the decoy's edge fragment shifting by a few pixels.
+- Part 2's one large novelty event, frame 731, is the "PART 2" title card
+  appearing.
+
+This was the last carrier class that could have hidden characters from every
+method used so far, precisely because it defeats all of them. It is not present
+in Puzzle #2. The census stands at 18.

@@ -47,3 +47,18 @@ separated in space (part 1's frame edges) or in time (part 2's alternating
 column). Rejoining them is what makes the characters readable; matching the
 halves against whole-glyph templates is what produced the earlier "not readable"
 results.
+
+## flash_scan.py
+
+Finds single-frame flashes -- content on screen for one frame at 60fps, which
+every averaging method destroys.
+
+```bash
+python3 flash_scan.py --frames f1/ --min-glyphs 4 --dump out/
+```
+
+On Puzzle #1's statement B it returns frames 1054 (21 glyph components), 1181
+(18) and 1040 (9). Statement A's flash at 1181, rotated and read bottom-up,
+gives `482BE6FB9C2` -- positions 37-47 of that puzzle's published answer, the
+span its static line omits. On both Puzzle #2 videos it returns nothing outside
+the known seam windows.
