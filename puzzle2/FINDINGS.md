@@ -738,3 +738,12 @@ noise, not a flash.
 This is the strongest form the negative can take. The author's hidden channel has
 been found, proven to carry the missing characters in the puzzle that *is*
 solved, and shown to be absent from the one that is not.
+
+Both polarities were checked. The control's flash is bright (+168, -76); a dark
+flash would have been missed by a positive-only scan, so the quiet periods of
+both Puzzle #2 videos were re-scanned on `max(+peak, -peak)`. Nothing exceeds 85,
+and every candidate above 40 resolves on inspection to a compression fluctuation
+on the edge of a glyph already accounted for -- h2 frame 1361's extreme sits at
+(447, 1023), which is the `I` of the MIRROR row; h2 frame 497 and h1 frame 1160
+likewise land on title letters. The 12-frame runs near frames 717-736 in both
+videos are the title scene change, not a flash.
