@@ -964,3 +964,49 @@ a second returns **nothing** on Puzzle #2, across every variant:
 Every carrier class the author is demonstrably known to use is now tested
 against a ground-truth positive control, and Puzzle #2 uses none of them beyond
 the two seams, the static block and the column. The census stands at 18 of 64.
+
+## The two videos share a background render, which gives the best noise floor available
+
+Part 1 and part 2 are built on the **same background animation, frame
+synchronised**. At matched timecodes their correlation is 0.992-0.998 with a
+mean absolute difference of about **1.0 gray level** across frames 0-730 and
+1660-1800; it drops to 0.45-0.70 only where their payload and title content
+genuinely differs.
+
+That makes each video a near-perfect background reference for the other -- a
+cancellation no spatial high-pass can approach, because it removes the moving
+cloud plate exactly rather than approximately.
+
+Two tests on it, both clean:
+
+- **Per-frame.** Scanning all 1800 inter-video differences for five or more
+  glyph-shaped components sharing a baseline flags 777 frames, all at known
+  content: the seams from 1220 on (amplitude 207, the payload glyphs
+  themselves), and title-transition frames. Restricted to the *synchronised*
+  ranges, where any structure would be unexplained, there are 13 row-events --
+  every one at y 288-360 spanning x 195-1063, which is exactly the title
+  letters, at frames 205-218, 300-307 and 714-721 where the two videos' title
+  fades differ by a frame or two. Frames 1660-1800 produce nothing at all.
+- **Deep-averaged.** Averaging the difference over the 730 synchronised early
+  frames drives the noise floor from 1.0 to about 0.02 gray levels. The result
+  (std 0.48, range -8.7 to +11.2) contains the title letters as faint timing
+  ghosts, the large `2`, the diamond and square overlay edges, and compression
+  blocking. **Nothing else.** A static layer present in one video and absent
+  from the other, at even a tenth of a gray level, would be unmissable here.
+
+Together with the flash work above, this closes the sensitivity question from
+both ends: the flash detector covers content too brief for averaging to see,
+and the background-cancelled deep average covers content too faint for anything
+else to see. Neither finds a character beyond the 18.
+
+Two further blind spots checked and closed:
+
+- **Frame extraction.** Coded-frame counts (`ffmpeg -map 0:v:0 -f null`) are
+  1800/1800/1200/1200, matching the extracted PNG counts exactly, and a
+  frame-indexed re-extraction matches the stored frames to a mean absolute
+  difference of 0.000. No frame was resampled away -- which matters, because a
+  resampling extraction is exactly what would drop a one-frame flash.
+- **Micro-text.** Every component filter used up to now required a height of at
+  least 10-12px. A dedicated scan for rows of 16+ components in the 4-12px range,
+  over the tile-stretched deep mean of every scene window of both videos, returns
+  zero rows.
