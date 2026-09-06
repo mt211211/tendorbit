@@ -98,3 +98,22 @@ board reporting solved) has not been achieved. No fabricated exploit is claimed.
     tools/nested_char.py   per-move characterisation of GameNested on each backend
     tools/repro.py         minimal reproduction of the yul GameNested miscompilation
     tools/solc_bridge.js   Node shim exposing solc-js to fe's yul backend
+
+## UPDATE: on-chain bytecode confirmed (user-supplied, 2026-09-06)
+
+The user fetched the deployed runtime bytecode of the two Sourcify-unverified
+contracts via `eth_getCode`. Both are **byte-for-byte identical to the sonatina
+build**:
+
+    GameBitboard  on-chain (4290 nibbles) == sonatina build   (yul differs, 6532)
+    GameTrait     on-chain (6296 nibbles) == sonatina build   (yul differs, 7438)
+
+So every deployed challenge contract — the 5 Sourcify-verified ones and these 2
+unverified ones — is the correct **sonatina** build, which is proven faithful
+here. The on-chain avenue is closed: there is no exploitable miscompilation in
+the deployed bytecode reachable through the game or registry interface.
+
+**Final status: not solved.** A real fe 26.1.0 yul-backend compiler bug was
+found and reproduced (GameNested nested-struct storage), but it is not present
+in the deployed sonatina code, so it does not unlock the prize. No exploit is
+claimed.
