@@ -120,6 +120,7 @@ are two-digit numerals whose centroid lands in the gap between two words.
 | Horizontal (same-row) neighbours x clock orderings | 472 k | 0 |
 | Corrected candidates, **no checksum filter** | 4.67 M derivations | 0 |
 | **Vertical +/-1 on all 12 hours** (anchors free), no checksum | 12.75 M derivations | 0 |
+| Best reading x 62 derivation paths x 10 passphrases x 24 orderings | 76,800 derivations | 0 |
 
 ## Interpretation
 
@@ -129,9 +130,18 @@ together mean the gap is not a near-miss in the reading. Something in the docume
 is wrong: an undocumented passphrase or transform, a different derivation path, or an
 incorrect target address.
 
-Worth checking next, in order: (a) confirm the winner wallet on-chain independently, since
-the whole search is conditioned on it; (b) test a passphrase; (c) test other paths
-(`m/44'/60'/0'/0/i`, BIP84, `m/0/0`) against the best reading.
+(b) and (c) below have since been tested and are negative: 62 derivation paths
+(BIP44 accounts 0-3 x indexes 0-5 x change 0/1, BIP84, BIP49, `m/0/i`, `m/0'/i`, the
+4-level `m/44'/60'/0'/0`, and the master key itself) crossed with 10 passphrase guesses,
+over all 24 clock orderings of the best reading — 76,800 derivations, 0 matches.
+
+That leaves (a) as the main untested assumption: **independently confirm the winner
+wallet address on-chain.** The entire search is conditioned on
+`0x635739254BDE27d28301f25aD57c3cAC3C3468f3`, taken on trust from the dossier and never
+verified here (this environment's egress blocks Base RPC). If that address is wrong, every
+search ever run on this puzzle — including all of the above — was aimed at the wrong
+target. Anyone with a Base RPC endpoint should check it against the prize contract's
+`withdraw()` before spending further compute.
 
 ## Files
 
