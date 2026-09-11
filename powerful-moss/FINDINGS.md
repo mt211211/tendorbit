@@ -135,13 +135,32 @@ The derivation variants have since been tested and are negative: 62 derivation p
 4-level `m/44'/60'/0'/0`, and the master key itself) crossed with 10 passphrase guesses,
 over all 24 clock orderings of the best reading — 76,800 derivations, 0 matches.
 
-That leaves one main untested assumption: **independently confirm the winner
-wallet address on-chain.** The entire search is conditioned on
-`0x635739254BDE27d28301f25aD57c3cAC3C3468f3`, taken on trust from the dossier and never
-verified here (this environment's egress blocks Base RPC). If that address is wrong, every
-search ever run on this puzzle — including all of the above — was aimed at the wrong
-target. Anyone with a Base RPC endpoint should check it against the prize contract's
-`withdraw()` before spending further compute.
+That leaves one main untested assumption: **the winner wallet address itself.** The entire
+search is conditioned on `0x635739254BDE27d28301f25aD57c3cAC3C3468f3`, and it has never
+been verified independently.
+
+Two checks were run here:
+
+- **Base RPC is unreachable** from this environment. Four public endpoints
+  (`mainnet.base.org`, `base.llamarpc.com`, `base-rpc.publicnode.com`, `1rpc.io/base`)
+  all return nothing, so the address cannot be confirmed on-chain here.
+- **No independent corroboration exists on GitHub.** A code search for the winner address
+  returns 7 hits and for the prize contract `0x831102C7eb86f9EC8f79dF891bDeA187D54344Dd`
+  returns 8 — and *every one* is either `floflo777/open-crypto-puzzles` itself, a fork of
+  it (`SmallCakekoo/open-crypto-puzzles`), or a list that aggregates it
+  (`itsnex1s/crypto-puzzle-list`). There is no second, independent source for either
+  address, and no copy of the prize contract's source.
+
+So the target is a **single-source claim**, and the contract's actual `withdraw()`
+condition has not been read by anyone in this chain of evidence. If the winner address is
+wrong, it explains every negative result above at once — including the otherwise very
+strange fact that a reading validated three independent ways fails under all 479 million
+of its orderings.
+
+**Recommended first step for anyone continuing:** with a working Base RPC, read the prize
+contract at `0x831102C7eb86f9EC8f79dF891bDeA187D54344Dd` and confirm what address (or
+condition) `withdraw()` actually accepts, before spending any further compute on word
+readings.
 
 ## Files
 
