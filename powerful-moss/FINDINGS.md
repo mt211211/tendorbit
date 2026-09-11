@@ -130,12 +130,12 @@ together mean the gap is not a near-miss in the reading. Something in the docume
 is wrong: an undocumented passphrase or transform, a different derivation path, or an
 incorrect target address.
 
-(b) and (c) below have since been tested and are negative: 62 derivation paths
+The derivation variants have since been tested and are negative: 62 derivation paths
 (BIP44 accounts 0-3 x indexes 0-5 x change 0/1, BIP84, BIP49, `m/0/i`, `m/0'/i`, the
 4-level `m/44'/60'/0'/0`, and the master key itself) crossed with 10 passphrase guesses,
 over all 24 clock orderings of the best reading — 76,800 derivations, 0 matches.
 
-That leaves (a) as the main untested assumption: **independently confirm the winner
+That leaves one main untested assumption: **independently confirm the winner
 wallet address on-chain.** The entire search is conditioned on
 `0x635739254BDE27d28301f25aD57c3cAC3C3468f3`, taken on trust from the dossier and never
 verified here (this environment's egress blocks Base RPC). If that address is wrong, every
