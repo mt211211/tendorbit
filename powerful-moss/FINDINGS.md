@@ -310,6 +310,25 @@ uniform (35-41 px). The four "thin" spokes at 0/90/180/270 degrees are the coord
 axis lines (the -10/-5/5/10 labels), not sunburst rays. There is no per-ray signal to
 carry a selection or ordering.
 
+## The PNG container, the alpha channel, and the absent clock hands
+
+Three cheap checks that had not been recorded, all negative but worth closing:
+
+- **Container.** `powerfulmoss-poap.png` (sha256 `6742c3c8...`) has chunks IHDR, iCCP, bKGD,
+  pHYs, tIME, tEXt, IDAT x94, IEND, and **zero bytes after IEND**. The only text chunk is
+  `Comment: Created with GIMP`; `tIME` is **2024-08-23 17:37:02**, five months before the
+  2025-01-17 launch. No stego payload in the container.
+- **The GIMP comment is substantive**, though: the artwork was composited in an image editor,
+  not emitted straight from matplotlib. That independently explains section 3a — hand-placed
+  numerals are exactly why the 12 radii scatter over 8.6 % instead of sitting on a circle.
+- **Alpha channel.** The file is RGBA, and 915,246 pixels are fully transparent — I had been
+  discarding alpha with `convert('RGB')` throughout. Checked directly: every transparent
+  pixel is RGB `(0,0,0)`, so **nothing is hidden under the transparency**, and alpha is just
+  the disc mask (246 distinct values, 6,568 partial, i.e. an antialiased edge).
+- **There are no clock hands.** The palette note called black "outside disc / hands", but
+  masking black inside radius 940, 900 and 800 px of the disc centre returns **0 pixels** in
+  every case. The clock has no hands, so there is no hand-based ordering signal to find.
+
 ## The "no distinctly marked word" claim, tested properly (`tools/inkscan.py`)
 
 The dossier's fact 4 asserts no word is distinctly marked, but rests on a histogram that
