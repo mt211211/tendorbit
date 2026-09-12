@@ -123,6 +123,19 @@ are two-digit numerals whose centroid lands in the gap between two words.
 | Best reading x 62 derivation paths x 10 passphrases x 24 orderings | 76,800 derivations | 0 |
 | Non-rotational orderings (reading / column / alphabetical) x +/-1 space | 3.19 M derivations | 0 |
 | **+/-2 window (full glyph span) x 30 orderings**, no checksum | **58.59 M derivations** | **0** |
+| **One anchor free to +/-2, others +/-1, x 30 orderings** | **63.77 M derivations** | **0** |
+
+Cumulative: **over 700 million certified derivations**, zero matches.
+
+### The anchors were tested too
+
+The three "confirmed" hours are not independent evidence — they come from the published
+analysis's own visual judgement using the *same* centroid rule applied here, so validating
+the rule against them is partly circular. Every other sweep held them fixed, meaning a
+single misread there would invalidate all of it. That was tested directly: each anchor in
+turn allowed to be up to 2 rows off (h12 -> `label`/`lobster`/`mammal`, h4 ->
+`squeeze`/`supreme`/`tag`, h8 -> `spoil`/`sugar`/`swing`) with every other hour at +/-1,
+across all 30 orderings — 63,772,920 derivations, 0 matches.
 
 ## All three published leads are now closed
 
