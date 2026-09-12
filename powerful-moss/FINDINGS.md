@@ -272,8 +272,17 @@ are two-digit numerals whose centroid lands in the gap between two words.
 | Non-rotational orderings (reading / column / alphabetical) x +/-1 space | 3.19 M derivations | 0 |
 | **+/-2 window (full glyph span) x 30 orderings**, no checksum | **58.59 M derivations** | **0** |
 | **One anchor free to +/-2, others +/-1, x 30 orderings** | **63.77 M derivations** | **0** |
+| Readings x 34 orderings (incl. album-track perms) x raw/repaired x 29 passphrases x 18 paths | 709,920 derivations | 0 |
+| **One word free anywhere in the 2048-word list**, 20 readings x 30 orderings x 12 positions, checksum-valid only, x 18 paths | **922,981 valid phrases = 16.6 M derivations** | **0** |
+| **Mechanism zoo**: 125 derivation mechanisms (BIP39, Electrum seed, raw-seed BIP32, 6 brainwallet hashes x 2 joins, 5 entropy-to-key schemes) x 8 readings x 34 orderings x raw/repaired | 68,000 derivations | 0 |
 
 Cumulative: **over 700 million certified derivations**, zero matches.
+
+The one-word-free result is the sharpest of these. It says: if ten hours are read
+correctly and the phrase is checksum-valid, then **no single substitution anywhere in
+the wordlist** — in any of 30 orderings, at any of 18 paths — reaches the winner. So
+either two or more words differ from the visual reading, or the derivation is not any
+of the 125 mechanisms tried.
 
 ### The anchors were tested too
 
