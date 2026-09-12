@@ -34,6 +34,26 @@ Colour census of `clues/powerfulmoss-poap.png` (2004x2011):
 | **`(83,83,83)`** | 142,126 | **clock numeral fill** |
 | **`(133,133,133)`** | 12,589 | **text showing through a numeral** |
 | `(177,0,0)` | 33,797 | text under a red ray |
+| `(117,117,0)` `(177,177,0)` `(83,83,0)` | 32,928 | **grid + ray-edge layer (B zeroed)** |
+| `(255,255,117)` `(255,255,177)` `(255,255,255)` | 30,541 | **title lettering (R,G forced to 255, B kept)** |
+
+The last two rows are new. An earlier version of this document listed only the
+first seven colours, which account for 3,481,711 of the image's 4,030,044 pixels —
+**13.6 % was unaccounted for**, and it hides two whole overlay layers:
+
+- a layer that zeroes only the **B** channel: the matplotlib **grid lines and the
+  sunburst ray edges** (rendered and eyeballed, `tools/L_yel.png`);
+- a layer that forces **R and G to 255 and preserves B**: the **"POWERFUL MOSS /
+  LOGIC BEACH" title lettering** (`tools/L_brt.png`). Because B survives, the text
+  under it is exactly recoverable.
+
+This matters beyond bookkeeping. The dossier's **"established fact 4"** states that
+a gray-intensity and hue histogram "shows exactly 1 text-gray population and only 2
+non-gray hue families", and concludes that this rules **out any distinctly marked
+word overlay**. The real image has at least **three** text-gray populations (177
+plain, 133 under-numeral, 177-in-B under the title) and **three** non-gray families.
+That histogram was wrong, so its conclusion was unsupported — see the direct test
+below, which reaches the same conclusion for a real reason.
 
 Two consequences that make everything else possible:
 
@@ -45,21 +65,118 @@ Two consequences that make everything else possible:
 
 ### 2. Layout
 
-- 42 text rows, pitch **48 px** (horizontal projection of the text mask).
-- Monospace cell width **25.46 px** (autocorrelation, confirmed by word-box regression).
+- 42 text rows, pitch **48 px** (horizontal projection of the text mask). The dossier says
+  39 rows; it is 42.
+- Monospace cell width **25.5617 px** (autocorrelation, then refined by the global fit below).
 - The wordlist is wrapped on a **wide virtual canvas and clipped to the circular disc** —
   each visible row is a contiguous alphabetical run, but consecutive rows skip words,
   because only the middle of each line falls inside the circle. Earlier reconstructions
   (mine and the dossier's) assumed a plain rectangular wrap, which is wrong.
 - Each row was identified by matching observed word-box widths (letter counts) against the
-  wordlist, then fitting the row origin `X0` so that `x = X0 + 25.46 * column`. Typical
+  wordlist, then fitting the row origin `X0` so that `x = X0 + CW * column`. Typical
   residual **< 1 px** (e.g. row 18 = `raccoon race rack radar radio rail rain raise rally
   ramp ranch random range rapid rare`).
+
+### 2a. The layout is solved exactly (`tools/layout.py`)
+
+The 28 independently identified rows turn out to obey a single global model. Join the
+2048 words with spaces into one 13,116-character stream and **hard-wrap it at exactly
+171 characters per line**; then for any character `p` on physical row `i`
+
+    x(p, i) = A + CW * (p - 171*i)       A = -154032.8 px   CW = 25.5617 px
+
+Evidence:
+
+- **CPL = 171.01 +/- 0.13** characters, estimated independently from each of 23
+  consecutive identified row pairs. A spread that tight rules out *word* wrapping,
+  which would vary the line advance by several characters; this is a hard character
+  wrap, so words are split across line boundaries off-screen.
+- The top of the image is virtual line **L0 = 35**, agreed by **28 of 28** rows
+  unanimously.
+- Re-deriving each row's start word from the model alone reproduces **28 of 28** of the
+  rows that were identified the hard way, by letter-count matching.
+
+Two consequences the dossier does not have:
+
+1. The wordlist needs **77 lines** but the image shows only **42** (lines 35-76). The
+   visible window is roughly the **back half of the wordlist, `inhale` .. `zoo`**. Every
+   marked word must lie in that range — words before `inhale` are not on the image at all.
+2. Every word's position is now computable in closed form, including for the 14 rows that
+   were never identified individually.
 
 ### 3. Reading the numerals
 
 Each numeral's glyph is extracted by connected components (two-digit numerals merged), and
 the marked word is the one containing the numeral's pixel centroid.
+
+### 3a. The numerals are NOT on a fixed-radius circle
+
+Fitting the 12 numerals to an ellipse at exact 30-degree intervals (`tools/anchorfit.py`,
+`tools/aligntest.py`) gives good *angles* (within ~0.5 degrees for most hours) but the
+*radii* vary from **803 to 871 px, a 8.6 % spread**, and no matplotlib text-alignment
+convention (all 9 combinations of `ha` x `va` were tried) brings the fit below ~21 px rms.
+
+So the numerals were not laid out by clock geometry and then allowed to fall where they
+may: **they were snapped onto the words they mark.** This is why the row assignment is
+stable but the radius is not, and it means the numeral position is evidence about the
+word, not about the clock.
+
+### 3b. The words under the numerals can simply be read (`tools/crops.py`)
+
+Because gray 133 is exactly "wordlist text seen through a numeral", mapping `133 -> text`
+and `83 -> background` **removes the numeral and restores the text underneath**. Rendering
+each hour's neighbourhood that way, with a crosshair at the numeral's bbox centre, makes
+the marked word directly legible instead of inferred:
+
+| hour | reading | crosshair lands |
+|---|---|---|
+| 1 | `mandate` | on the word, low in the row |
+| 2 | `oyster` | on the word |
+| 3 | `romance` | on the word |
+| 4 | **`strategy`** | mid-word (anchor) |
+| 5 | `turtle` | mid-word |
+| 6 | `vintage` | on its final `e`, just before the space |
+| 7 | `tuition` | on its final `n` |
+| 8 | **`stick`** | mid-word (anchor) |
+| 9 | `riot` | on the word (confirms Correction 1) |
+| 10 | `outdoor` / `outer` | **exactly in the gap between them** |
+| 11 | `main` / `major` | **exactly in the gap between them** |
+| 12 | **`leisure`** | mid-word (anchor) |
+
+All three published anchors reproduce visually, which validates the render. Ten of the
+twelve hours are now read with no ambiguity; only h10 and h11 are genuinely undecidable
+from this raster, exactly as the dossier says — but see the next section, because the
+alternates were never actually searched.
+
+### 3c. A ranked distance metric — and a real gap it exposes (`tools/rankcand.py`)
+
+Ranking *every* word in the rows a numeral spans by 2D distance to the numeral centre
+(horizontal distance to the word box, vertical distance to the row centre, vertical
+weighted 0.55) is self-validating: the three known anchors come out **top-ranked at the
+smallest distances in the whole table** (`stick` 1 px, `leisure` 5 px, `strategy` 6 px).
+
+| hour | ranked candidates (distance px) |
+|---|---|
+| 1 | mandate(10) mechanic(15) logic(38) |
+| 2 | oyster(6) open(24) opera(27) |
+| 3 | romance(10) retreat(16) sand(34) |
+| 4 | **strategy(6)** squeeze(23) square(24) |
+| 5 | turtle(7) unlock(20) trash(31) |
+| 6 | vintage(2) waste(25) valve(29) |
+| 7 | tuition(4) unique(24) uniform(28) |
+| 8 | **stick(1)** spoil(25) sugar(29) |
+| 9 | riot(8) require(18) saddle(32) |
+| 10 | outer(12) **outdoor(15)** okay(23) |
+| 11 | main(15) maze(15) meadow(20) **major(20)** |
+| 12 | **leisure(5)** lobster(19) label(34) |
+
+This exposed a genuine defect in every sweep run on this puzzle, mine included. All of
+them built candidates as "the nearest word **in** row *r*", then varied only *r*. That
+rule returns **one word per row**, so the horizontal alternates at precisely the two
+ambiguous hours — **`outdoor` at h10 and `major` at h11** — were *never in any candidate
+list*, despite both being named in the best-reading table as live alternatives. The
+"horizontal neighbours" sweep in the ledger held the rows fixed at centre, so it did not
+cover them either. The vertical and horizontal ambiguities had never been crossed.
 
 ## Validation (three independent checks)
 
@@ -86,17 +203,48 @@ Centroid-to-row-centre distances: h9 = 14.5 px to row 21 vs 32 px to row 20; h10
 to row 12 vs 42 px to row 11. **Every prior search used wrong candidates at these two
 positions.**
 
-## Correction 2 — every prior search filtered by BIP39 checksum
+## Correction 2 — the BIP39 checksum, and how to use it
 
 The published ledger records testing "1,193,373 combinations (**132,597 checksum-valid**)";
-all my earlier sweeps did the same. But BIP39 seed derivation is `PBKDF2` over the phrase —
-the checksum is only a validity flag that wallets enforce, not part of the derivation. If
-the artist marked 12 words on the clock and funded whatever wallet that phrase produced,
-the answer is checksum-**invalid** and is invisible to every search ever run on this puzzle.
+all my earlier sweeps did the same. BIP39 seed derivation is `PBKDF2` over the phrase — the
+checksum is only a validity flag that wallets enforce, not part of the derivation — so a
+checksum-invalid phrase still derives a perfectly real wallet, and would be invisible to a
+filtered search. That is why every sweep in the table below was run **unfiltered**.
 
-This is not hypothetical: the best geometric reading
-(`mandate oyster romance strategy turtle vintage tuition stick riot outer main leisure`)
-**is checksum-invalid**.
+An earlier version of this document stopped there and treated the checksum purely as a blind
+spot. That was half the picture, and the weaker half. The stronger argument runs the other
+way and is worth stating plainly, because it changes what to search:
+
+**The artist funded a real wallet.** Nobody marks 12 arbitrary words and hopes the result is
+checksum-valid — that is a 1-in-16 shot. You generate a mnemonic in a wallet or a tool, get a
+valid one by construction, and *then* place those 12 words on the clock. So the true phrase
+should be checksum-**valid**, and the checksum is a strong prior and a 16x speedup, not just
+a trap.
+
+That produces a sharp tension, because the geometric reading is **invalid** — and so are all
+four combinations of the two ambiguous hours:
+
+| h10 | h11 | checksum |
+|---|---|---|
+| outer | main | invalid |
+| outer | major | invalid |
+| outdoor | main | invalid |
+| outdoor | major | invalid |
+
+So on this model at least one of the ten "certain" words must be misread, **or** the phrase
+was passed through a checksum repairer. Both branches are now searched:
+
+- **Mechanism A — the true reading is checksum-valid.** Enumerate ranked candidates and keep
+  only valid orderings (`tools/csweep.py A`).
+- **Mechanism B — checksum repair.** What Ian Coleman's BIP39 tool and most "fix checksum"
+  utilities do: keep the 128 entropy bits, recompute the 4 checksum bits. This changes
+  **only the final word** (`tools/csrepair.py`, certified: identity on an already-valid
+  mnemonic, always valid out, never alters more than the last word). For the primary reading
+  it turns `... outer main leisure` into `... outer main leave`.
+- **One word free anywhere.** If ten hours are right and exactly one word is wrong, the
+  checksum cuts the 2048 replacements to ~128, so "one word misread and it could be **any**
+  word in the list" is searchable in minutes — far broader than the +/-2-row windows every
+  previous sweep used (`tools/onefree.py`).
 
 ## Best reading
 
@@ -161,6 +309,23 @@ spread** — i.e. they all simply terminate at the disc edge; inner radii are li
 uniform (35-41 px). The four "thin" spokes at 0/90/180/270 degrees are the coordinate
 axis lines (the -10/-5/5/10 labels), not sunburst rays. There is no per-ray signal to
 carry a selection or ordering.
+
+## The "no distinctly marked word" claim, tested properly (`tools/inkscan.py`)
+
+The dossier's fact 4 asserts no word is distinctly marked, but rests on a histogram that
+missed two whole layers (above). So the claim was re-tested directly rather than trusted:
+for all **305 complete word boxes** across the 28 reconstructed rows, count text pixels and
+normalise by box area — a bolded, recoloured or otherwise emphasised word must show
+anomalous ink density.
+
+Result: mean density 0.186, sd 0.092, and **every outlier is explained by a known overlay**.
+The high tail (`search` z=+3.3, `sail`, `scrap`, `scrub`, `salmon`, all in rows 22-23) sits
+directly under the "LOGIC BEACH" title lettering, which adds ink; the zero-density tail
+(`lamp`, `leopard`, `vault`, `winner` ...) is words clipped away by the disc. Controlling
+for word length changes nothing.
+
+**No word is distinctly marked.** The dossier's conclusion holds — but now for a measured
+reason instead of a faulty histogram.
 
 ## Interpretation
 
@@ -230,6 +395,24 @@ in the gated content**, so the raster ambiguity cannot be resolved this way.
     tools/final_read.py    picks each numeral's word by under-numeral pixel overlap
     tools/final_sweep.py   vertical +/-1 sweep over all 12 hours x clock orderings
     tools/hneigh.py        horizontal-neighbour sweep
+    tools/flowfit.py       global continuous-flow test; recovers CPL = 171.01 +/- 0.13
+    tools/layout.py        exact layout model (hard wrap, CW, L0); 28/28 rows reproduced
+    tools/crops.py         de-obscures each numeral so the word under it can be READ
+    tools/rankcand.py      ranked candidates by 2D distance to the numeral centre
+    tools/anchorfit.py     ellipse fit to the 12 numerals
+    tools/aligntest.py     matplotlib ha/va anchor-convention model selection
+    tools/inkscan.py       per-word ink density; tests the "marked word" claim directly
+    tools/csrepair.py      BIP39 checksum repair (certified)
+    tools/pathcross.py     shared-seed prefix tree over 18 derivation paths (certified
+                           path-by-path against direct derivation)
+    tools/csweep.py        ranked-candidate sweep, checksum as prior, 18 paths
+    tools/onefree.py       one-word-free-anywhere search using the checksum as a solver
+
+    figures/L_yel.png      the grid + ray-edge layer, isolated
+    figures/L_brt.png      the title-lettering layer, isolated
+    figures/crop_h12.png   de-obscured h12 -> crosshair squarely on `leisure`
+    figures/crop_h10.png   de-obscured h10 -> crosshair in the `outdoor`/`outer` gap
+    figures/crop_h11.png   de-obscured h11 -> crosshair in the `main`/`major` gap
 
 The oracle is self-certifying: any candidate deriving the winner wallet is proof. Nothing
 in this document is a claimed solve.
