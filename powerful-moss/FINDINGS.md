@@ -175,32 +175,51 @@ The derivation variants have since been tested and are negative: 62 derivation p
 4-level `m/44'/60'/0'/0`, and the master key itself) crossed with 10 passphrase guesses,
 over all 24 clock orderings of the best reading — 76,800 derivations, 0 matches.
 
-That leaves one main untested assumption: **the winner wallet address itself.** The entire
-search is conditioned on `0x635739254BDE27d28301f25aD57c3cAC3C3468f3`, and it has never
-been verified independently.
+## RESOLVED: the target address is correct (contract decoded)
 
-Two checks were run here:
+This was the last unverified assumption, and it is now settled. The prize contract's
+runtime bytecode was read via `eth_getCode` and decoded. `withdraw()` (selector
+`0x2f0c39ec`) contains literally:
 
-- **Base RPC is unreachable** from this environment. Four public endpoints
-  (`mainnet.base.org`, `base.llamarpc.com`, `base-rpc.publicnode.com`, `1rpc.io/base`)
-  all return nothing, so the address cannot be confirmed on-chain here.
-- **No independent corroboration exists on GitHub.** A code search for the winner address
-  returns 7 hits and for the prize contract `0x831102C7eb86f9EC8f79dF891bDeA187D54344Dd`
-  returns 8 — and *every one* is either `floflo777/open-crypto-puzzles` itself, a fork of
-  it (`SmallCakekoo/open-crypto-puzzles`), or a list that aggregates it
-  (`itsnex1s/crypto-puzzle-list`). There is no second, independent source for either
-  address, and no copy of the prize contract's source.
+    PUSH20 635739254bde27d28301f25ad57c3cac3c3468f3    <- winner
+       ... EQ CALLER ... OR
+    PUSH20 035032655b5b3784d359b56eb82c803bd971c582    <- owner (early-withdraw path)
 
-So the target is a **single-source claim**, and the contract's actual `withdraw()`
-condition has not been read by anyone in this chain of evidence. If the winner address is
-wrong, it explains every negative result above at once — including the otherwise very
-strange fact that a reading validated three independent ways fails under all 479 million
-of its orderings.
+with the revert string **"Only the winner can withdraw the pot"**. So
+`0x6357...68f3` is hardcoded as the winner. Other constants decoded from the bytecode all
+match the published description, confirming the decode: launch `0x678ab6c0` =
+2025-01-17 20:00:00 UTC, minimum claimable `0x03782dace9d90000` = 0.25 ETH, mint price
+0.001 ETH, growth window `0x4f1a00` = 60 days.
 
-**Recommended first step for anyone continuing:** with a working Base RPC, read the prize
-contract at `0x831102C7eb86f9EC8f79dF891bDeA187D54344Dd` and confirm what address (or
-condition) `withdraw()` actually accepts, before spending any further compute on word
-readings.
+**Consequence:** the negative results above are real. The search was aimed at the right
+wallet, so the defect lies in the readout rule, not the target.
+
+## RESOLVED: the NFT-gated CID contains no finer artwork
+
+The contract has a second, separate string in **storage slot 8**, returned by `getCID()`
+and gated on `balanceOf(msg.sender) > 0` plus the launch timestamp — distinct from
+`baseURI` (slot 10), which is what `tokenURI` returns and all the published analysis ever
+checked. The gate exists only in the getter, so the slot is readable by anyone via
+`eth_getStorageAt`:
+
+    slot  8 (gated CID) = https://ipfs.io/ipfs/QmXpuV2psiXPoGF4Ac6KwTA2KE6U3rwUnn3izAHWmAfWKb/
+    slot 10 (baseURI)   = https://ipfs.io/ipfs/QmXuC6cLqXkq4puj8BoxrqDjxVD9jUmUdKaUNjjJX8jasw/
+
+This was worth chasing because the published notes state *"no source of the plot finer than
+the published 2004x2011 raster is known to exist"* — and they never opened slot 8.
+
+Contents (a 488,260,402-byte ZIP), enumerated in full:
+
+    Powerful_Moss/PowerFulMoss_savedCover_after_crash.png   484,726   album cover art
+    Powerful_Moss/<12 tracks>_final.wav                     12 lossless masters
+    __MACOSX/._*                                            12 resource-fork stubs
+    Powerful_Moss/.DS_Store                                 no ghost filenames
+
+Despite the suggestive "savedCover_after_crash" name, the PNG is the **album cover
+artwork** (forest scene, title lettering) — not the clock-and-wordlist plot. The 24 audio
+entries are 12 WAV masters plus their 12 macOS `._` stubs, i.e. the same 12 masters
+already analysed and found empty. **There is no higher-resolution source of the clock plot
+in the gated content**, so the raster ambiguity cannot be resolved this way.
 
 ## Files
 
