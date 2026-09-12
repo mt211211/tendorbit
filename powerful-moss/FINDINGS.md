@@ -319,6 +319,15 @@ uniform (35-41 px). The four "thin" spokes at 0/90/180/270 degrees are the coord
 axis lines (the -10/-5/5/10 labels), not sunburst rays. There is no per-ray signal to
 carry a selection or ordering.
 
+The lead named *length*, so ray **width** was also measured, to close the remaining
+degree of freedom (`tools/raywidth.py`). Angular width does vary — 10.23 to 12.41
+degrees, a 19 % spread — but it is **not per-ray information**: the values repeat with
+a period of exactly 6 rays (90 degrees), so ray 0/6/12/18 = 10.49/10.46/10.40/10.23,
+ray 3/9/15/21 = 12.37/12.40/12.41/12.41, and so on. Width is a pure function of
+angle modulo 90 degrees, i.e. an artifact of sampling a fixed-width wedge on a square
+pixel grid. Hour-aligned and between-hour spokes are indistinguishable (mean width
+11.53 vs 11.41 degrees). **Lead 3 is closed on both length and width.**
+
 ## The PNG container, the alpha channel, and the absent clock hands
 
 Three cheap checks that had not been recorded, all negative but worth closing:
