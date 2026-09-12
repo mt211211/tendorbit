@@ -121,6 +121,33 @@ are two-digit numerals whose centroid lands in the gap between two words.
 | Corrected candidates, **no checksum filter** | 4.67 M derivations | 0 |
 | **Vertical +/-1 on all 12 hours** (anchors free), no checksum | 12.75 M derivations | 0 |
 | Best reading x 62 derivation paths x 10 passphrases x 24 orderings | 76,800 derivations | 0 |
+| Non-rotational orderings (reading / column / alphabetical) x +/-1 space | 3.19 M derivations | 0 |
+| **+/-2 window (full glyph span) x 30 orderings**, no checksum | **58.59 M derivations** | **0** |
+
+## All three published leads are now closed
+
+**Lead 1 — widen the row window.** The published note reasons from "a serif numeral spans
+about 2 text rows", so it used a +/-1 window. Measured directly, each digit glyph is
+**~242 px tall = ~5 text rows** at the 48 px pitch, so +/-1 never covered even half the
+numeral's vertical extent. I ran the exhaustive +/-2 pass (the numeral's full span): 5
+candidates per hour on the corrected grid, anchors fixed, 1,953,125 word-sets x 30
+orderings (24 rotations + reading/column/alphabetical), no checksum filter =
+**58,593,750 derivations, 0 matches**. By the lead's own stated kill criterion
+("widening every doubtful hour ... with no match closes this specific readout rule"),
+the numeral-overlays-word rule is now **closed** — and this went further than proposed,
+widening all hours simultaneously rather than one at a time.
+
+**Lead 2 — sample the numeral's bottom pixel.** Refuted analytically, no brute force
+needed: h12's glyph spans y44-291, so its bottom edge lands in row 6, which would
+contradict the confirmed `leisure` in row 3. The centroid is the only sample point
+consistent with all three anchors.
+
+**Lead 3 — sunburst ray length as a selector.** Refuted by measurement. The rays sit at
+exact 15 degree intervals (24 of them). Their outer radii are **980-989 px — a 1 %
+spread** — i.e. they all simply terminate at the disc edge; inner radii are likewise
+uniform (35-41 px). The four "thin" spokes at 0/90/180/270 degrees are the coordinate
+axis lines (the -10/-5/5/10 labels), not sunburst rays. There is no per-ray signal to
+carry a selection or ordering.
 
 ## Interpretation
 
