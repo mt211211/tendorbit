@@ -148,6 +148,32 @@ twelve hours are now read with no ambiguity; only h10 and h11 are genuinely unde
 from this raster, exactly as the dossier says — but see the next section, because the
 alternates were never actually searched.
 
+### 3b-2. Word boxes measured from the pixels (`tools/wordboxes.py`)
+
+The fitted row origins carry ~2.5 px of error, the same order as the h10/h11 ambiguity,
+so the model cannot settle them. Segmenting each row's text mask by its column
+projection gives the real ink extents, with no model in the loop. Where the numeral
+centre falls inside its word:
+
+| hour | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 12 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| word | mandate | oyster | romance | **strategy** | turtle | vintage | tuition | **stick** | riot | **leisure** |
+| position in word | 32 % | 39 % | 46 % | 66 % | 22 % | **93 %** | **99 %** | 61 % | 58 % | 48 % |
+
+h10 falls in the gap between `outdoor` (ends x=301) and `outer` (starts x=336), 6 px
+from the gap centre; h11 in the gap between `main` (ends 609) and `major` (starts 638),
+1 px from the gap centre. Those two really are undecidable, and both alternates are now
+searched.
+
+The useful new signal is **h6 at 93 % and h7 at 99 %**: those numeral centres sit on the
+word's trailing edge, which makes the same-row **right neighbours** (`violin`, `tumble`)
+live candidates. They rank 4th-5th by distance and so were cut from every candidate list
+ever used, including the ranked top-3 below. `tools/hcross.py` therefore sweeps a
+candidate set built purely from measured boxes — the word containing the centre plus its
+left and right neighbours on the home row, plus the word containing the centre one row
+up and one row down. Result: **5,065,447 checksum-valid phrases x 5 paths = 25.3 M
+derivations, 0 matches.** The word neighbourhood is now exhausted.
+
 ### 3c. A ranked distance metric — and a real gap it exposes (`tools/rankcand.py`)
 
 Ranking *every* word in the rows a numeral spans by 2D distance to the numeral centre
@@ -275,6 +301,8 @@ are two-digit numerals whose centroid lands in the gap between two words.
 | Readings x 34 orderings (incl. album-track perms) x raw/repaired x 29 passphrases x 18 paths | 709,920 derivations | 0 |
 | **One word free anywhere in the 2048-word list**, 20 readings x 30 orderings x 12 positions, checksum-valid only, x 18 paths | **922,981 valid phrases = 16.6 M derivations** | **0** |
 | **Mechanism zoo**: 125 derivation mechanisms (BIP39, Electrum seed, raw-seed BIP32, 6 brainwallet hashes x 2 joins, 5 entropy-to-key schemes) x 8 readings x 34 orderings x raw/repaired | 68,000 derivations | 0 |
+| **Ranked candidates x 30 orderings, checksum-valid only, 18 paths** (first sweep containing `outdoor` and `major`) | **2,214,273 valid phrases = 39.9 M derivations** | **0** |
+| **Measured-box candidates** (home-row left/right neighbours + rows +/-1) x 30 orderings, checksum-valid, 5 paths | **5,065,447 valid phrases = 25.3 M derivations** | **0** |
 
 Cumulative: **over 700 million certified derivations**, zero matches.
 
