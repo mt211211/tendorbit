@@ -648,3 +648,48 @@ most English phrases do. All 288 combinations x 34 orderings x raw/repaired x 18
 paths = **352,512 derivations, 0 matches**. The track-order reading
 (`era power man empty rare comfort curve forest fall cliff shadow antenna`) is also
 checksum-invalid.
+
+## The album video — analysed in full (33:04)
+
+Fetched by the user (YouTube is blocked by this session's egress policy: the proxy
+returns 403 on CONNECT) and analysed locally at 256x144, 23.976 fps, **47,575 frames**.
+
+### The video is exactly the twelve tracks, back to back
+
+The track durations measured from the WAVs sum to **1984.42 s**; the video runs
+**1984.27 s**. So every track maps to a known span of the video:
+
+| track | span | | track | span |
+|---|---|---|---|---|
+| 1 generative adversarial neurology | 00:00-01:12 | | 7 curved horizon | 14:42-18:03 |
+| 2 powerful moss | 01:12-04:23 | | 8 dark forest | 18:03-21:20 |
+| 3 too many bees | 04:23-07:02 | | 9 falling up | 21:20-24:29 |
+| 4 empty long waves | 07:02-10:47 | | 10 cliffside | 24:29-27:45 |
+| 5 temporare | 10:47-12:49 | | 11 shadow realm | 27:45-30:22 |
+| 6 discomfort meditation | 12:49-14:42 | | 12 gravitational wave antannae | 30:22-33:04 |
+
+Near-black frames cluster at 07:02 and 18:03, matching the boundaries exactly.
+
+### The intro is a title card sequence, and it states the mechanism
+
+Read frame by frame from 00:00 to 00:39:
+
+> **LOGIC BEACH** / *Presents* / **Powerful Moss** / **12 songs** / **12 seed words** /
+> **1 ETH** / *Can you solve it?*
+
+This is the artist's own statement of the puzzle, rendered in the work itself, and it
+confirms the correction above: twelve songs, twelve seed words. It is promotional
+text, not the answer.
+
+### Frame-level scan
+
+A full-rate pass over all 47,575 frames recording per-frame brightness, contrast,
+bright/dark fractions and inter-frame difference found only **3 isolated single-frame
+flashes** and **1 text-card candidate** — all four inspected, all ordinary animation.
+Median inter-frame difference is 26.5, i.e. the video is continuously morphing
+AI-generated animation rather than static art per track, so a hidden frame cannot hide
+in stillness.
+
+Tesseract 5.3.4 OCR was calibrated against the known intro text and **fails at 144p on
+this stylised, texture-embedded lettering** (it renders "Can you" as "CON Yer"). A
+full 1 fps OCR sweep filtered for BIP39 tokens was run regardless.
