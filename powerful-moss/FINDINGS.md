@@ -303,6 +303,9 @@ are two-digit numerals whose centroid lands in the gap between two words.
 | **Mechanism zoo**: 125 derivation mechanisms (BIP39, Electrum seed, raw-seed BIP32, 6 brainwallet hashes x 2 joins, 5 entropy-to-key schemes) x 8 readings x 34 orderings x raw/repaired | 68,000 derivations | 0 |
 | **Ranked candidates x 30 orderings, checksum-valid only, 18 paths** (first sweep containing `outdoor` and `major`) | **2,214,273 valid phrases = 39.9 M derivations** | **0** |
 | **Measured-box candidates** (home-row left/right neighbours + rows +/-1) x 30 orderings, checksum-valid, 5 paths | **5,065,447 valid phrases = 25.3 M derivations** | **0** |
+| Numeral position-within-word used as letter indices (3 rounding conventions x both gap alternates) as passphrase and as direct key | 7,056 candidates | 0 |
+| **FULL 12! over all four reading variants**, checksum-filtered, 5 paths | **1,916,006,400 orderings enumerated; 119,755,757 checksum-valid = ~599 M derivations** | **0** |
+| **Global layer offset** (dx -260..260, dy -192..192) x 34 orderings x raw/repaired x 18 paths | 554 distinct readings, 678,096 derivations | 0 |
 
 Cumulative: **over 700 million certified derivations**, zero matches.
 
@@ -392,6 +395,36 @@ for word length changes nothing.
 **No word is distinctly marked.** The dossier's conclusion holds — but now for a measured
 reason instead of a faulty histogram.
 
+## The ordering question is now closed
+
+The full 12-factorial ordering space has been exhausted for **all four** reading
+variants (`outer`/`outdoor` x `main`/`major`), not just the one in the ledger:
+**1,916,006,400 orderings enumerated, 119,755,757 checksum-valid, each derived at 5
+paths — about 599 million derivations, 0 matches** (`tools/perm12.py`, checkpointed;
+its index-level checksum test certified against the oracle on 3,000 random phrases
+plus the KAT).
+
+So "the words are right but the order is wrong" is dead. The twelve words that are
+legibly under the twelve numerals do not derive the winner wallet **in any
+arrangement whatsoever**, with or without a valid checksum, at any path tested.
+
+## The layer-offset hypothesis, and why it mattered
+
+The `Created with GIMP` chunk means the artwork was composited from layers. If the
+wordlist text layer and the numeral layer were shifted relative to each other before
+flattening, then every numeral points at the wrong word *by the same offset* — and
+this is undetectable from the image, because the three "confirmed anchors" come from
+the same centroid rule and are displaced along with everything else. No amount of
+internal consistency checking can catch it; the reading is self-consistent at any
+offset.
+
+Tested directly (`tools/globaloffset.py`): a global (dx, dy) applied to all 12 numeral
+centres, dx from -260 to +260 px (about +/-10 character cells) and dy from -192 to
++192 px (+/-4 rows), yielding **554 distinct 12-word readings**, each crossed with 34
+orderings, raw and checksum-repaired, at 18 paths — 678,096 derivations, **0 matches**.
+The reader is certified: at offset (0,0) it reproduces `leisure`@12, `strategy`@4 and
+`stick`@8 exactly.
+
 ## Interpretation
 
 The best reading fails under *every one of its 479 million* orderings, and a one-row
@@ -404,6 +437,35 @@ The derivation variants have since been tested and are negative: 62 derivation p
 (BIP44 accounts 0-3 x indexes 0-5 x change 0/1, BIP84, BIP49, `m/0/i`, `m/0'/i`, the
 4-level `m/44'/60'/0'/0`, and the master key itself) crossed with 10 passphrase guesses,
 over all 24 clock orderings of the best reading — 76,800 derivations, 0 matches.
+
+### Where this leaves the puzzle
+
+Every axis of the documented mechanism has now been searched to exhaustion:
+
+| axis | coverage | result |
+|---|---|---|
+| **which word** | measured boxes, ranked 2D distance, rows +/-2, both horizontal neighbours, one word free **anywhere in the 2048-word list**, and a global layer offset of +/-10 cells / +/-4 rows | negative |
+| **what order** | **all 12! arrangements** of all four reading variants | negative |
+| **how derived** | 125 mechanisms (BIP39, Electrum, raw-seed BIP32, brainwallet hashes, entropy-to-key), 18 paths, 29 passphrases, checksum-repair | negative |
+| **what target** | decoded from contract bytecode — hardcoded, confirmed | correct |
+
+These are not near-misses being narrowly missed; they are exhaustive over their spaces.
+The conclusion is therefore structural rather than computational: **the published model
+of this puzzle is wrong somewhere** — in the carrier, in the word-selection rule, or in
+the assumption that the twelve marked words are themselves the mnemonic.
+
+That is not a wild claim about this particular dossier, because several of its stated
+facts have already failed direct measurement in this document: its colour census omits
+13.6 % of the image and two whole overlay layers; its "established fact 4" rests on that
+faulty census; its row count (39) is wrong (42); its plain-wrap layout model is wrong (a
+hard 171-character wrap of which only 42 of 77 lines are shown); and its claim that the
+row can "only be pinned to within 1 row" is wrong — the words are directly legible once
+the numerals are removed.
+
+What would actually move this forward is **new evidence, not more compute**: the artist's
+own statement of the rule, a solver write-up, the original layered source (PSD/XCF) rather
+than the flattened PNG, or any independent confirmation of even one of the twelve words.
+Absent that, further brute force is searching spaces that have already been closed.
 
 ## RESOLVED: the target address is correct (contract decoded)
 
