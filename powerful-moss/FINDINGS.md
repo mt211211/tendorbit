@@ -2,17 +2,75 @@
 
 Target: `2-mid-prizes/logicbeach-powerful-moss-0-54eth` in `floflo777/open-crypto-puzzles`.
 
-**Status: NOT SOLVED.** No seed recovered, nothing claimed. What follows is a set of
-*verified* results that correct the published analysis and materially change the search
-space. They are recorded because they are reproducible and useful to anyone continuing
-this puzzle — not because they constitute a solve.
+**Status: NOT SOLVED.** No seed recovered, nothing claimed.
 
-## Summary
+> ## THE CARRIER IS THE ALBUM, NOT THE POAP IMAGE
+>
+> The dossier's central premise is wrong, and the artist says so in their own words on
+> the album page:
+>
+> > *"A 12-word seed is spread across the 12 tracks of the album. Like a clock, year, or
+> > seed phrase, this album has 12 of 'em."*
+>
+> **One seed word per track.** The POAP clock is thematic art — a clock because the album
+> has twelve of something, drawn over the BIP39 wordlist because the prize is a seed
+> phrase. The words its numerals happen to overlap are not the seed.
+>
+> Everything below the divider was built on the dossier's assumption and is now known to
+> be aimed at the wrong target. It is kept because the image analysis is correct and
+> reproducible, and because the ~1.4 billion negative derivations are what finally proved
+> the premise false rather than merely unlucky. See
+> **"How the premise collapsed"** for the evidence, and `tools/analyze_tracks.py` for the
+> per-track hunt that replaces it.
 
-The puzzle is a POAP image: a clock face with 12 numerals laid over the full alphabetical
-BIP39 wordlist. Each numeral marks a word; the 12 words in clock order are meant to form a
-12-word BIP39 mnemonic deriving the winner wallet
-`0x635739254BDE27d28301f25aD57c3cAC3C3468f3` at `m/44'/60'/0'/0/0`.
+## How the premise collapsed
+
+Three independent strands agree:
+
+1. **The artist's own description** (above): the seed is spread across the 12 tracks.
+2. **Precedent — "Bifurcations" (2020, solved).** The 12 words were extracted *per track*:
+   track 1 a spectrogram image plus Morse (`west`), **track 3 Morse played on the drums**
+   (kick = dash, snare = dot, around 1:31), track 4 an **SSTV Robot-36** payload; and the
+   word *order* was hidden separately, as spoken digits of the Feigenbaum constant whose
+   deliberate errors spelled `6 4 2 3 9 7 8 1 5`.
+3. **Precedent — the 2021 `.eth` puzzle.** 12 words hidden across 7 tracks, 7 music videos
+   and the album cover, all declared "fair play", with the author warning that ears alone
+   would not be enough — you also need eyes and a terminal.
+
+This also dissolves the two anomalies this document could measure but never explain:
+
+- The numerals are **not on a fixed-radius circle** (radii 803-871 px, 8.6 % spread) and
+  no matplotlib text-alignment convention fits better than ~21 px rms. I read that as
+  "hand-placed onto words". The simpler reading, given `Created with GIMP`, is
+  **hand-placed for looks** — which is what decoration does.
+- The numeral centres land at 22 %, 32 %, 39 %, 46 %, 48 %, 57 %, 60 %, 69 %, 93 %, 98 %
+  through their words and twice in a bare gap. A rule that marks words does not scatter
+  like that; decoration does.
+
+### The dossier's reason for dismissing the audio does not hold
+
+It records that the masters have "close to 0 percent energy above 13 kHz ... so there is
+no high band left to carry spectrogram text". That is true and irrelevant: it rules out
+exactly one technique. **Morse on the drums, spoken words, SSTV in the voice band, tempo
+and rhythm encodings all live in the audible range.** The artist's own prior puzzle hid a
+word in a drum pattern at normal listening frequencies. So the audio was never excluded on
+sound grounds.
+
+`tools/analyze_tracks.py` sweeps those techniques per track — drum-Morse (kick/snare),
+tone-Morse in three bands, SSTV sync detection, DTMF, LSB payloads, stereo side-channel
+content, high-band energy, and contrast-stretched spectrograms in four views. Its
+detectors are certified by `--selftest`, which synthesises a track carrying drum-Morse for
+a real BIP39 word and confirms recovery, plus an LSB round-trip.
+
+---
+
+## Summary (of the superseded POAP-image analysis)
+
+The dossier holds that the puzzle is a POAP image: a clock face with 12 numerals laid over
+the full alphabetical BIP39 wordlist, each numeral marking a word, the 12 words in clock
+order forming a mnemonic deriving the winner wallet
+`0x635739254BDE27d28301f25aD57c3cAC3C3468f3` at `m/44'/60'/0'/0/0`. The image work below
+is sound; the premise it serves is not.
 
 I reconstructed the image's layout exactly and read all 12 marked words directly from the
 pixels. The method is validated three independent ways (below). It nevertheless does not
