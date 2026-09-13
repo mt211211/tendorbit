@@ -693,3 +693,21 @@ in stillness.
 Tesseract 5.3.4 OCR was calibrated against the known intro text and **fails at 144p on
 this stylised, texture-embedded lettering** (it renders "Can you" as "CON Yer"). A
 full 1 fps OCR sweep filtered for BIP39 tokens was run regardless.
+
+### OCR sweep of the video — negative
+
+Tesseract over all 1,984 one-second frames in two polarities (~4,000 OCR calls) flagged
+55 frames containing a BIP39 token. **All are hallucinations on repetitive AI-generated
+texture**, not text:
+
+- The same frame at 25:22 yields `riot` in one polarity and `birth` in the other. Real
+  lettering does not change when you invert the image.
+- Surrounding output is meaningless (`AG OLR 3 sail y | 1} Lon`).
+- The 00:10 hit "TOWER" is Tesseract misreading the scrawled *Powerful* title card.
+- Four of the strongest hits (02:22 `seed`, 25:22, 26:39 `SALT`, 29:55 `CASE`) were
+  inspected directly: a robot and three cityscapes, **no text in any of them**.
+- A 1.4 % hit rate across ~4,000 calls is the expected false-positive rate for a 2048-word
+  list full of short common words.
+
+**No seed words are displayed anywhere in the video.** It is a promotional album video
+whose only real text is the 39-second title sequence. The carrier remains the audio.
