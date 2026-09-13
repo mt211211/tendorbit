@@ -4,30 +4,39 @@ Target: `2-mid-prizes/logicbeach-powerful-moss-0-54eth` in `floflo777/open-crypt
 
 **Status: NOT SOLVED.** No seed recovered, nothing claimed.
 
-> ## THE CARRIER IS THE ALBUM, NOT THE POAP IMAGE
+> ## RETRACTION — I claimed the carrier was the album; the evidence does not support it
 >
-> The dossier's central premise is wrong, and the artist says so in their own words on
-> the album page:
+> An earlier version of this document asserted, in a banner like this one, that the POAP
+> was decoration and that one seed word was hidden in each track. It quoted the artist as
+> writing:
 >
-> > *"A 12-word seed is spread across the 12 tracks of the album. Like a clock, year, or
-> > seed phrase, this album has 12 of 'em."*
+> > *"A 12-word seed is spread across the 12 tracks of the album."*
 >
-> **One seed word per track.** The POAP clock is thematic art — a clock because the album
-> has twelve of something, drawn over the BIP39 wordlist because the prize is a seed
-> phrase. The words its numerals happen to overlap are not the seed.
+> **That sentence does not exist.** It was a search engine's paraphrase, which I presented
+> as a direct quotation. The album page's verbatim text, retrieved later from the page
+> source, reads:
 >
-> Everything below the divider was built on the dossier's assumption and is now known to
-> be aimed at the wrong target. It is kept because the image analysis is correct and
-> reproducible, and because the ~1.4 billion negative derivations are what finally proved
-> the premise false rather than merely unlucky. See
-> **"How the premise collapsed"** for the evidence, and `tools/analyze_tracks.py` for the
-> per-track hunt that replaces it.
+> > *"Like a clock, year, or seed phrase, this album has 12 of 'em. 12 songs... and all
+> > **that implies**. There's more waiting for those who pay attention and fall through the
+> > surface cracks. **Can you find it? and when you do find it, can you solve it!?**"*
+>
+> — where "that implies" is a hyperlink to the Wikipedia article on **seed phrases**. So the
+> artist draws a *parallel* (12 songs ↔ 12 seed words) and describes a two-stage puzzle:
+> **find** a hidden thing, then **solve** it. Nothing says each song contains a word.
+>
+> Combined with the launch tweet — *"8 people have discovered the @poapxyz. This is a good
+> sign ;]"* — the thing to **find** is almost certainly the POAP, and the thing to **solve**
+> is its clock image. That is the dossier's original reading, and it is probably right.
+>
+> What survives: the target wallet is confirmed from bytecode, the POAP layout is solved
+> exactly, and the specific readout rule *"numeral centre marks a word, clock order,
+> standard path"* is exhausted to ~1.4 billion derivations. **The target is right and the
+> readout rule is wrong** — which is a much narrower open question than "wrong carrier".
 
-## How the premise collapsed
+## The album-carrier case, and why it is weaker than I presented it
 
-Three independent strands agree:
-
-1. **The artist's own description** (above): the seed is spread across the 12 tracks.
+1. ~~The artist's own description~~ — **retracted**, see above. No artist-published source
+   says the seed is distributed across the tracks.
 2. **Precedent — "Bifurcations" (2020, solved).** The 12 words were extracted *per track*:
    track 1 a spectrogram image plus Morse (`west`), **track 3 Morse played on the drums**
    (kick = dash, snare = dot, around 1:31), track 4 an **SSTV Robot-36** payload; and the
@@ -749,3 +758,32 @@ One real discrepancy does come out of this JSON. The metadata spells track 12
 `12 gravitational wave antannae.wav` — misspelled *and* the only track missing the
 `_final` suffix. Both sources are artist-controlled, so this is a genuine inconsistency
 in the release rather than an inferred typo.
+
+## The artist's own page source — nothing further
+
+Retrieved `logicbeach.xyz/powerfulmoss.html` in full. Findings:
+
+- **The two cover filenames are one file.** The page serves
+  `images/powerfulmoss/PowerFulMoss_savedCover.png`; the ZIP and NFT carry
+  `PowerFulMoss_savedCover_after_crash.png`. Both are **484,726 bytes, sha256
+  `e9e29ebc...`** — byte-identical. The "after crash" suffix is a name, not a second
+  version, so there is no before/after diff to exploit.
+- **`abi.json`** is stock OpenZeppelin ERC721 + Ownable + ReentrancyGuard plus
+  `getCID`, `viewPot`, `withdrawPOT`, `updateCID`, `setBaseTokenURI`, `tokenCounter`,
+  `deploymentTime`, `initialWithdrawLimit`, `potWithdrawn`. **No undocumented function.**
+- **`js/noisepm.js`** is a decorative canvas-noise animation; no payload.
+- No HTML comments beyond section markers.
+- Oddity, probably a dev leftover: the description's "prize wallet" link points at
+  **sepolia**.basescan.org for `0xC8083039E91C0BE0cC801e116A9EB06FA24A6434`, a testnet
+  address unrelated to the live contract `0x831102C7...`.
+
+## The POAP as a plot: axis calibration
+
+The image is a matplotlib figure with a visible grid and axis labels -10/-5/5/10, so it
+has real data coordinates, never previously used. Calibrated from the grid layer:
+**91.4 px per data unit, origin at pixel (1001.5, 1008)** (grid lines recovered at
+`1001.5 ± k·91.4` horizontally and `1008 ± k·91.4` vertically).
+
+In data coordinates the 12 numerals sit at radii **8.74 to 9.49** — the same ~8 % scatter
+seen in pixel space, and not integers. So the numerals are not placed at round data
+coordinates either, and the coordinate system yields no selector.
