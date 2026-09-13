@@ -787,3 +787,35 @@ has real data coordinates, never previously used. Calibrated from the grid layer
 In data coordinates the 12 numerals sit at radii **8.74 to 9.49** — the same ~8 % scatter
 seen in pixel space, and not integers. So the numerals are not placed at round data
 coordinates either, and the coordinate system yields no selector.
+
+## Re-examination for a SECOND marking layer
+
+The image separates into four overlays on three base values, but only one of them
+(gray-83 numerals) has ever been used as a word selector. Each of the others was tested
+directly (`tools/layermark.py`).
+
+| candidate second layer | test | result |
+|---|---|---|
+| **Alpha channel** | the file is RGBA; 6,568 partial-alpha pixels | all lie at radius **989-1000 px**, i.e. the disc edge. **Zero partial-alpha pixels inside the disc** — alpha is an antialiased mask, not a marker |
+| **Unexplained colour population** | full gray census on opaque pixels | every population decomposes into the four known overlays on bases 117/177/83 plus their antialiasing. No orphan layer |
+| **Sunburst ray tips** | read the wordlist at each of the 24 ray tips, at r = 900/940/960/975 px | the word changes with radius (`romance/opera/logic` at 900 vs `romance/opera/length` at 960) — the rays terminate uniformly at the disc edge, so no tip word is defined |
+| **Per-word coverage by red-ray layer** | fraction of each word's text pixels under a ray | 180 words above 5 % — rays are wide wedges crossing everything, no clean set |
+| **Per-word coverage by grid layer** | same | 13 words, all in rows 36 and 13, i.e. simply where two horizontal grid lines fall |
+| **Per-word coverage by title layer** | same | 30 words above 5 %, following the lettering's shape |
+| **Two-overlay intersection** | words ≥15 % covered by two different overlays | **14** words, and the set tracks where big numerals happen to sit under wide rays |
+| **Word position nudged off-grid** | measured ink edges against the exact layout model for 259 boxes | largest outliers (`safe` +37 px, `live` +35 px, `track` +29 px) all carry width errors of −44 to −31 px, i.e. they are **clipped by the disc**, not displaced. sd of the left-edge residual is 5 px, consistent with clipping alone |
+| **Word at the sunburst centre** | (1001.8, 1005.4) | `road` — nothing distinguishing |
+
+### One genuinely new readout rule did come out of it
+
+Reading each numeral by **the word it covers most** (from the gray-133 layer) rather than
+by the word containing its centroid gives a different answer at several hours, and
+partially agrees with the published anchors (`stick` at h8 under both measures, `turtle`
+at h5, `strategy` at h4 by absolute pixels):
+
+    by max covered fraction : logic nut sand tag turtle water toddler stick riot nose load man
+    by max covered pixels   : logic pioneer retreat strategy turtle water toddler stick require nose meadow mammal
+
+Neither appears in any candidate list ever used on this puzzle. `tools/covsweep.py` sweeps
+the coverage-ranked space (top-3 per numeral by fraction, plus the top word by absolute
+pixels; 944,784 sets x 34 orderings x checksum-valid raw and repaired x 5 paths).
