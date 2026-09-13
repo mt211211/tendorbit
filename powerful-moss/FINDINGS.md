@@ -601,3 +601,23 @@ in the gated content**, so the raster ambiguity cannot be resolved this way.
 
 The oracle is self-certifying: any candidate deriving the winner wallet is proof. Nothing
 in this document is a claimed solve.
+
+## Track 1 analysed in full — clean
+
+`1 generative adversarial neurology_final.wav` (48 kHz, 16-bit stereo, exactly
+3,456,000 samples = 72.000 s) is the most anomalous track on metadata: 16-bit in a
+24-bit album, a third the length of the others, and a spectrogram of ~13 discrete
+harmonic blocks that looks constructed. Every test is negative:
+
+| test | result |
+|---|---|
+| RIFF container | bare `fmt` + `data`, no metadata chunks, **0 bytes after the last chunk** |
+| LSB bit-planes 0-3, both channels | ones = 0.4993-0.5004, lag-1 corr < 0.009, byte entropy **8.000/8** — ordinary dither, no payload |
+| spectrogram: mono, L, R, **side (L-R)** | harmonic drones only; side channel carries nothing distinct (L/R corr 0.39) |
+| reversed, lead-in 0-5 s, tail 67-72 s | nothing |
+| top band 13.5-24 kHz | narrow lines present but local prominence only **~2x** — harmonics of the synth, not planted carriers |
+| fundamental-pitch sequence | sparse bass drone (C2 / G#1 / F2), not a data sequence |
+| drum-Morse, tone-Morse, DTMF, SSTV | noise (300+ onsets = a groove, not Morse) |
+
+So the per-track payload, if it exists, is not in track 1 — or is not carried by any
+of these mechanisms.
