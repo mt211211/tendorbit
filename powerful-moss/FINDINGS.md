@@ -819,3 +819,21 @@ at h5, `strategy` at h4 by absolute pixels):
 Neither appears in any candidate list ever used on this puzzle. `tools/covsweep.py` sweeps
 the coverage-ranked space (top-3 per numeral by fraction, plus the top word by absolute
 pixels; 944,784 sets x 34 orderings x checksum-valid raw and repaired x 5 paths).
+
+### The coverage readout rule is also negative
+
+`tools/covsweep.py` completed: **34,129,307 phrases x 5 paths = 170.6 M derivations, 0
+matches**, over the coverage-ranked candidate space (top-3 per numeral by covered
+fraction plus the top word by absolute covered pixels, 944,784 sets x 34 orderings x
+checksum-valid-raw and checksum-repaired).
+
+So both natural readout rules are now exhausted against a target confirmed from bytecode:
+
+| readout rule | space searched | result |
+|---|---|---|
+| numeral **centroid** marks a word | ~1.4 billion derivations, incl. all 12! orderings, 18 paths, 125 mechanisms, one-word-free-anywhere, global layer offsets | 0 |
+| numeral **covers** a word | 170.6 M derivations, 34 orderings, raw + repaired | 0 |
+
+Together with the second-layer examination above — alpha, orphan colour populations, ray
+tips, per-layer word coverage, two-overlay intersections, off-grid displacement — the
+image has no remaining untested selector that I can identify.
