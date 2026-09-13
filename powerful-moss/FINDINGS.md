@@ -711,3 +711,22 @@ texture**, not text:
 
 **No seed words are displayed anywhere in the video.** It is a promotional album video
 whose only real text is the 39-second title sequence. The carrier remains the audio.
+
+## Full-album audio sweep (from the video's audio stream) — negative
+
+The album audio was obtained as the video's Opus stream (18.5 MB for all 33 minutes,
+since the individual WAVs exceed the upload limit), decoded to 48 kHz stereo, and split
+into the twelve tracks using the boundary map derived above. Lossy, so LSB work is not
+possible — but every technique that carried a word in "Bifurcations" is audible-range
+and survives.
+
+| test | result |
+|---|---|
+| Per-track spectrograms, full track | no drawn content; the one striking feature, a sharp rectangular void at 5-15.5 kHz in track 3 (~99-107 s), is a band-limited filter sweep with content continuing above and below |
+| Per-track spectrograms re-rendered as 20 s strips at ~100 px/s (10x the time resolution, enough to read lettering) | no lettering in tracks 1 or 12 |
+| **Speech-modulation scan** across all 33 minutes (4 Hz syllable-rate energy in the 300-4000 Hz envelope) | max score 11.4 vs median 3.1, with peak rates scattered 2-8 Hz — rhythm at various tempos, not speech. Real speech clusters at 3-5 Hz with far higher contrast |
+| Quietest 0.5 s windows per track ("fall through the surface cracks" read literally) | all are track fade-ins/fade-outs; the only mid-track quiets are track 3 ~100 s (the filter sweep), track 5 ~111/118 s, track 11 ~43 s — nothing under them |
+
+Note the resolution trap this exposed: a whole-track spectrogram squashes ~200 s into
+~1900 px (0.1 s/px), so a drawn image lasting a few seconds is ~20 px wide and
+invisible. Any future visual sweep must be done at strip resolution or finer.
