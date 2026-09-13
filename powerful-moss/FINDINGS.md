@@ -621,3 +621,30 @@ harmonic blocks that looks constructed. Every test is negative:
 
 So the per-track payload, if it exists, is not in track 1 — or is not carried by any
 of these mechanisms.
+
+## The NFT-gated cover PNG — clean
+
+`PowerFulMoss_savedCover_after_crash.png` (484,726 bytes, sha256 `e9e29ebc...`,
+732x731 RGB, `tIME` 2024-09-01 23:27:45) sits behind the NFT gate in storage slot 8,
+which the published analysis never opened, and its filename ("saved cover **after
+crash**") reads like a deliberate hint. It is nevertheless clean:
+
+- **Container**: IHDR, iCCP, pHYs, tIME, 60x IDAT, IEND. Every CRC valid, **0 bytes
+  after IEND**, no `tEXt`/`zTXt` (note: unlike the POAP, no GIMP comment).
+- **LSB planes**: neighbour agreement 0.66-0.72 horizontally and vertically, i.e.
+  spatially correlated like natural image content. A written payload would sit at 0.5.
+- **Shadow stretch** (bottom 35 % of the tonal range): forest scene only.
+- **Channel differences** R-G, G-B, R-B: only the same artwork and lettering, no
+  separated layer — the technique that exposed four overlay layers on the POAP finds
+  nothing here.
+- Bottom band at native resolution: pixel-art foliage, not glyphs.
+
+## Track titles as a carrier — negative
+
+Every one of the 12 titles contains a BIP39 word as a substring (`power`, `rare`,
+`curve`, `forest`, `cliff`, `shadow`, `antenna`, `empty`, `comfort`, `era`, `fall`,
+`man`), which is suggestive until you note that BIP39 contains many short words, so
+most English phrases do. All 288 combinations x 34 orderings x raw/repaired x 18
+paths = **352,512 derivations, 0 matches**. The track-order reading
+(`era power man empty rare comfort curve forest fall cliff shadow antenna`) is also
+checksum-invalid.
