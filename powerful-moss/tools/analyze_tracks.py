@@ -34,7 +34,7 @@ report.  Send the PNGs and the report back for interpretation.
 
     python analyze_tracks.py --selftest      # certify the detectors
 """
-import os, sys, json, wave, argparse, math
+import os, sys, json, argparse
 
 import numpy as np
 
@@ -158,9 +158,8 @@ def morse_from_onsets(times, marks, unit=None):
     gaps = [marks[i + 1][0] - marks[i][0] for i in range(len(marks) - 1)]
     if not gaps:
         return MORSE.get(marks[0][1], '')
-    g = np.array(gaps)
     if unit is None:
-        unit = np.median(g)
+        unit = float(np.median(gaps))
     letters, cur = [], [marks[0][1]]
     for i, gp in enumerate(gaps):
         if gp > unit * 2.6:
@@ -229,8 +228,6 @@ def tone_morse(x, sr, lo, hi):
     if len(ons) < 3:
         return ''
     u = np.percentile(ons, 30)
-    marks = [(k, '.' if d < u * 2 else '-') for k, (v, d)
-             in enumerate(runs) if v for _ in [0]]
     seq = []
     for v, d in runs:
         if v:
