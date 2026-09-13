@@ -63,28 +63,74 @@ WORDS = bip39()
 
 # ---------------------------------------------------------------- audio I/O
 def read_wav(path):
-    """-> (float mono in [-1,1], sample rate, n_channels, sampwidth)"""
-    with wave.open(path, 'rb') as w:
-        nch, sw, sr, n = w.getnchannels(), w.getsampwidth(), \
-            w.getframerate(), w.getnframes()
-        raw = w.readframes(n)
-    if sw == 1:
-        a = (np.frombuffer(raw, '<u1').astype(np.float32) - 128) / 128.0
-    elif sw == 2:
-        a = np.frombuffer(raw, '<i2').astype(np.float32) / 32768.0
-    elif sw == 3:
-        b = np.frombuffer(raw, np.uint8).reshape(-1, 3).astype(np.int32)
-        v = (b[:, 0] | (b[:, 1] << 8) | (b[:, 2] << 16))
-        v = np.where(v & 0x800000, v - (1 << 24), v)
-        a = v.astype(np.float32) / 8388608.0
-    elif sw == 4:
-        a = np.frombuffer(raw, '<i4').astype(np.float32) / 2147483648.0
+    """Parse RIFF/WAVE directly.
+
+    Python's `wave` module rejects WAVE_FORMAT_EXTENSIBLE and 32-bit float
+    files, which is what a lot of mastering chains emit, so parse the chunks
+    ourselves.  -> (mono float, sr, n_channels, sampwidth, all channels)
+    """
+    with open(path, 'rb') as fh:
+        data = fh.read()
+    if len(data) < 44 or data[:4] != b'RIFF' or data[8:12] != b'WAVE':
+        head = data[:4]
+        if head[:2] == b'\x00\x05' or len(data) < 2000:
+            raise ValueError(
+                f'not audio ({len(data)} bytes) - this looks like a macOS '
+                'AppleDouble "._" resource-fork stub, not the real track')
+        raise ValueError(f'not a RIFF/WAVE file (starts with {head!r})')
+
+    fmt = None; raw = None
+    i = 12
+    while i + 8 <= len(data):
+        cid = data[i:i + 4]
+        csz = int.from_bytes(data[i + 4:i + 8], 'little')
+        body = data[i + 8:i + 8 + csz]
+        if cid == b'fmt ':
+            fmt = body
+        elif cid == b'data':
+            raw = body
+        i += 8 + csz + (csz & 1)          # chunks are word-aligned
+    if fmt is None or raw is None:
+        raise ValueError('missing fmt or data chunk')
+
+    tag = int.from_bytes(fmt[0:2], 'little')
+    nch = int.from_bytes(fmt[2:4], 'little')
+    sr = int.from_bytes(fmt[4:8], 'little')
+    bits = int.from_bytes(fmt[14:16], 'little')
+    if tag == 0xFFFE and len(fmt) >= 26:   # EXTENSIBLE: real tag in the GUID
+        tag = int.from_bytes(fmt[24:26], 'little')
+    sw = max(1, bits // 8)
+
+    if tag == 3:                            # IEEE float
+        if bits == 32:
+            a = np.frombuffer(raw, '<f4').astype(np.float32)
+        elif bits == 64:
+            a = np.frombuffer(raw, '<f8').astype(np.float32)
+        else:
+            raise ValueError(f'float WAV with {bits} bits')
+    elif tag == 1:                          # PCM
+        if bits == 8:
+            a = (np.frombuffer(raw, '<u1').astype(np.float32) - 128) / 128.0
+        elif bits == 16:
+            a = np.frombuffer(raw, '<i2').astype(np.float32) / 32768.0
+        elif bits == 24:
+            n = len(raw) // 3 * 3
+            b = np.frombuffer(raw[:n], np.uint8).reshape(-1, 3).astype(np.int32)
+            v = b[:, 0] | (b[:, 1] << 8) | (b[:, 2] << 16)
+            v = np.where(v & 0x800000, v - (1 << 24), v)
+            a = v.astype(np.float32) / 8388608.0
+        elif bits == 32:
+            a = np.frombuffer(raw, '<i4').astype(np.float32) / 2147483648.0
+        else:
+            raise ValueError(f'PCM WAV with {bits} bits')
     else:
-        raise ValueError(f'unsupported sample width {sw}')
+        raise ValueError(f'compressed WAV (format tag {tag}) - convert to PCM '
+                         'first, e.g. ffmpeg -i in.wav -c:a pcm_s16le out.wav')
+
     if nch > 1:
-        a = a.reshape(-1, nch)
-        mono = a.mean(axis=1)
-        return mono, sr, nch, sw, a
+        usable = len(a) // nch * nch
+        a = a[:usable].reshape(-1, nch)
+        return a.mean(axis=1), sr, nch, sw, a
     return a, sr, nch, sw, a.reshape(-1, 1)
 
 
@@ -248,7 +294,12 @@ def lsb_text(raw_channels, sw):
         by = np.packbits(b, axis=1).ravel()
         s = ''.join(chr(c) if 32 <= c < 127 else '\n' for c in by[:400000])
         for run in s.split('\n'):
-            if len(run) >= 6:
+            # random LSBs throw up short printable runs constantly; a real
+            # payload is long and word-like, so demand both
+            if len(run) < 12:
+                continue
+            letters = sum(c.isalnum() or c == ' ' for c in run)
+            if letters / len(run) >= 0.85 or find_words(run):
                 out.append((order, run[:120]))
     return out[:40]
 
@@ -433,23 +484,44 @@ def main():
         sys.exit(0 if selftest() else 1)
     if not a.directory:
         ap.error('give the folder containing the 12 .wav files')
-    files = sorted(f for f in os.listdir(a.directory)
-                   if f.lower().endswith('.wav') and not f.startswith('._'))
-    if not files:
-        print('No .wav files found. Note: files starting with "._" are macOS '
-              'resource-fork stubs, not audio - use the real ones.')
+    # walk the whole tree: the real masters usually sit in a subfolder, and
+    # the "._" twins in __MACOSX/ are 226-byte stubs, not audio
+    found, stubs = [], []
+    for root, dirs, fs in os.walk(a.directory):
+        dirs[:] = [d for d in dirs if d != '__MACOSX' and d != '_analysis']
+        for f in fs:
+            if not f.lower().endswith('.wav'):
+                continue
+            p = os.path.join(root, f)
+            if f.startswith('._') or os.path.getsize(p) < 100_000:
+                stubs.append(p)
+            else:
+                found.append(p)
+    if stubs:
+        print(f'ignoring {len(stubs)} macOS resource-fork stubs / tiny files '
+              f'(e.g. {os.path.basename(stubs[0])}, '
+              f'{os.path.getsize(stubs[0])} bytes) - these are NOT the audio, '
+              'which is why they will not play')
+    if not found:
+        print('\nNo real .wav files found under that folder.')
+        print('The playable masters live in the "Powerful_Moss" subfolder and '
+              'are tens of MB each;\nthe "._" copies under "__MACOSX" are '
+              '~226-byte stubs macOS adds when zipping.')
+        print('Point this script at the folder you extracted the ZIP into and '
+              'it will find them itself.')
         sys.exit(1)
+    found.sort()
     outdir = os.path.join(a.directory, '_analysis')
     os.makedirs(outdir, exist_ok=True)
-    print(f'{len(files)} tracks -> {outdir}')
+    print(f'{len(found)} real tracks -> {outdir}')
     if not WORDS:
         print('NOTE: `pip install mnemonic` to enable BIP39 word matching.')
     reps = []
-    for fn in files:
+    for p in found:
         try:
-            reps.append(analyse(os.path.join(a.directory, fn), outdir))
+            reps.append(analyse(p, outdir))
         except Exception as e:
-            print(f'  !! {fn}: {e}')
+            print(f'  !! {os.path.basename(p)}: {e}')
     with open(os.path.join(outdir, 'report.json'), 'w') as fh:
         json.dump(reps, fh, indent=1)
     print(f'\nWrote {outdir}/report.json plus spectrogram PNGs.')
