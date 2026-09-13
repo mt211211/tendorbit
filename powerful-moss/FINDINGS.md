@@ -730,3 +730,22 @@ and survives.
 Note the resolution trap this exposed: a whole-track spectrogram squashes ~200 s into
 ~1900 px (0.1 s/px), so a drawn image lasting a few seconds is ~20 px wide and
 invisible. Any future visual sweep must be done at strip resolution or finer.
+
+## The NFT `image` CID is the cover PNG (same bytes)
+
+`tokenURI` metadata at the `baseURI` CID is a **single JSON file, not a directory** — all
+tokens share one record, so there are no per-track attributes and no per-song word there.
+It does list an `image`:
+
+    https://ipfs.io/ipfs/QmdaZnAoEyaFjMcGTU751KrSmYJehZC1Atv3zdv73pzL9F
+
+Fetched and hashed: **sha256 `e9e29ebcbb56d751e7e35640b741b2fb1c6187e451ba0a12a1b0e6d80fcd8f6f`,
+732x731 RGB, 484,726 bytes — identical to `PowerFulMoss_savedCover_after_crash.png`** from
+the gated ZIP, already analysed and clean. The artist pinned the same cover under a second
+CID; it is not a separate asset.
+
+One real discrepancy does come out of this JSON. The metadata spells track 12
+**`GravitationalWaveAntennae`** correctly, while the shipped file is
+`12 gravitational wave antannae.wav` — misspelled *and* the only track missing the
+`_final` suffix. Both sources are artist-controlled, so this is a genuine inconsistency
+in the release rather than an inferred typo.
