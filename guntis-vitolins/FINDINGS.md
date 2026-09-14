@@ -68,3 +68,57 @@ Each unit also re-derives its first candidate through a fresh call and must agre
 Prior estimate that it hits: **10-20 %**, being the chance the author used a non-default
 account index. This is a bounded experiment with a defined payoff either way, not a search
 for an insight that may not exist.
+
+---
+
+## RESULT — lead 3 is a certified negative
+
+The sweep completed cleanly on 2026-09-14.
+
+| | |
+|---|---|
+| units | **816 / 816**, every one `witness OK` |
+| arrangements enumerated | **167,688,000** |
+| checksum-valid derivations | **10,484,919** |
+| derivation paths per phrase | **18** |
+| total derivations | **≈ 188.7 million** |
+| matches | **0** |
+| wall clock | 104.9 min on 4 CPU cores, 1,667 derivations/s |
+
+### The enumeration is provably the same space as the original RO1
+
+My run produced **exactly 10,484,919** checksum-valid derivations. The folder's own
+`analysis/tested.md` records the RO1 sweep at **10,484,919** (lines 110 and 139). An
+identical count to the digit, from an independently driven run, is strong evidence that
+the space enumerated here is the same one — which is what makes this negative
+transferable rather than merely a negative about some nearby space.
+
+### What this closes
+
+Every negative in that folder was previously a negative *at the MetaMask default path*.
+This upgrades them: the RO1 reading-order model is now negative across
+`m/44'/60'/0'/0/{0..4}`, the change chain, accounts 1-3, the 4-level Ledger-style form,
+`m/0..2` and the master key — 18 paths in total, a superset of the 4 the folder named.
+
+So the hypothesis "the author funded from a second MetaMask account, and every recorded
+negative is about the wrong address" is **dead**. The remaining gap is word
+identification, exactly as the folder's own lead ranking argues.
+
+## Sizing the next lead (lead 1: on-screen words)
+
+Lead 1 found the real blocking gap: 122 dictionary words are legible on screen and 109 of
+them appear in no written surface, so the pool every sweep used was incomplete. The five
+that match the portfolio-table prediction are `atom`, `link`, `basic`, `token`, `dash`.
+
+Extending the RO1 model to admit them as free-position video words, sized here:
+
+| coin words admitted | arrangements | derivations | hours at 1,667/s x 18 paths |
+|---|---|---|---|
+| 0 (= RO1, done) | 167,688,000 | 10,484,919 | 1.7 (done) |
+| at most 1 | 1,817,028,000 | 113,564,250 | 18.9 |
+| at most 2 | 4,170,780,000 | 260,673,750 | 43.4 |
+| at most 4 | 4,903,711,200 | 306,481,950 | 51.1 |
+
+The **exactly-one-coin-word** shell is 103,083,750 derivations, about 17 hours across 18
+paths — the highest-prior slice, since a phrase drawing one word from the on-screen
+portfolio table is far likelier than one drawing four.
