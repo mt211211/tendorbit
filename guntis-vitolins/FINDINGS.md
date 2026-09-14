@@ -122,3 +122,42 @@ Extending the RO1 model to admit them as free-position video words, sized here:
 The **exactly-one-coin-word** shell is 103,083,750 derivations, about 17 hours across 18
 paths — the highest-prior slice, since a phrase drawing one word from the on-screen
 portfolio table is far likelier than one drawing four.
+
+---
+
+## Lead 1 — RUNNING
+
+`tools/gv_lead1.py`, launched 2026-09-14. Same discipline as lead 3: the anchors, the
+layout/fork logic, the post-side reading order, the checksum filter and `scan_unit`
+itself are the folder's own, imported unchanged. **Only `video_sets` is replaced**, by
+`coin_vsets`, which builds RO1's video rows with exactly one coin word inserted at any
+free video position. Derivation is the same certified 18-path tree lead 3 used, so this
+is a superset of what another solver was reported to be running (default path only).
+
+"Free" is the substance of the model: on-screen text carries no reading-order position,
+so a coin word may sit at any of the video slots rather than being slotted in sequence.
+That is why this is not simply RO1 with five extra words in the pool.
+
+### Selftest
+
+    shape (2, 2): 6,250 rows (closed form 6,250) OK
+    shape (3, 1): 20,500 rows (closed form 20,500) OK
+    video pairs 404,250  arrangements 1,649,340,000  derivations ~103,083,750
+    rows with exactly one coin word: OK
+    planted in-space phrase (contains a coin word) at m/44'/60'/2'/0/0: OK (witness OK)
+
+Row counts are checked against a closed form derived independently of the generator, so
+an enumeration bug that dropped or duplicated rows would show up as a count mismatch
+rather than pass silently. As in lead 3, a real in-space phrase — one that actually
+contains a coin word — is derived at a non-default path, made the target, and recovered.
+
+### Observed rate
+
+Per unit: 2,021,250 arrangements → ~126,100 checksum-valid derivations × 18 paths,
+`witness OK`, 298 s on one core. 816 units on 4 cores ≈ **17.0 h**. Measured yield
+816 × 126,100 = 102.9M against the closed form's 103,083,750, so the running space is
+the predicted one.
+
+Resumable: each completed unit is appended to a TSV and a restart skips logged units.
+On a hit the phrase is written to `GV_LEAD1_HIT.txt` and deliberately not printed,
+following the folder's protocol ("sweep the wallet before disclosing anything").
