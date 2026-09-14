@@ -27,10 +27,9 @@ the folder's own protocol.
 import itertools, os, sys, time, json
 from multiprocessing import Pool
 
-HERE = ('/tmp/claude-0/-home-user-tendorbit/5dbf252a-6161-5f73-beaf-adcafb3d494f/'
-        'scratchpad/ocp/1-big-prizes/guntis-vitolins-metamask-8-6eth')
-SCRATCH = ('/tmp/claude-0/-home-user-tendorbit/5dbf252a-6161-5f73-beaf-adcafb3d494f/'
-           'scratchpad')
+SCRATCH = os.environ.get('GV_ROOT') or os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.join(SCRATCH, 'ocp', '1-big-prizes',
+                    'guntis-vitolins-metamask-8-6eth')
 sys.path.insert(0, os.path.join(HERE, 'tools'))
 sys.path.insert(0, SCRATCH)
 

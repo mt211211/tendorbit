@@ -29,10 +29,9 @@ SIZE (closed form, checked by --selftest)
 """
 import itertools, math, os, sys, time
 
-HERE = ('/tmp/claude-0/-home-user-tendorbit/5dbf252a-6161-5f73-beaf-adcafb3d494f/'
-        'scratchpad/ocp/1-big-prizes/guntis-vitolins-metamask-8-6eth')
-SCRATCH = ('/tmp/claude-0/-home-user-tendorbit/5dbf252a-6161-5f73-beaf-adcafb3d494f/'
-           'scratchpad')
+SCRATCH = os.environ.get('GV_ROOT') or os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.join(SCRATCH, 'ocp', '1-big-prizes',
+                    'guntis-vitolins-metamask-8-6eth')
 sys.path.insert(0, os.path.join(HERE, 'tools'))
 sys.path.insert(0, SCRATCH)
 
@@ -145,23 +144,42 @@ def selftest():
     print('SELFTEST OK')
 
 
+def _logged(path, into):
+    if os.path.exists(path):
+        for line in open(path):
+            c0 = line.rstrip('\n').split('\t')
+            if len(c0) > 1 and c0[0] != 'unit':
+                into.add(int(c0[0]))
+    return into
+
+
 if __name__ == '__main__':
     if '--selftest' in sys.argv:
         selftest(); sys.exit(0)
+    # --slice I/N : take only units with idx % N == I, into a per-slice log.
+    # Slices are disjoint by construction, so several containers can share the
+    # sweep and the logs merge by unit index with no overlap.
+    si, sn = 0, 1
+    if '--slice' in sys.argv:
+        si, sn = (int(x) for x in sys.argv[sys.argv.index('--slice') + 1].split('/'))
+        assert 0 <= si < sn
+        LOG = os.path.join(SCRATCH, f'gv_lead1_s{si}of{sn}.tsv')
+        HIT = os.path.join(SCRATCH, f'GV_LEAD1_HIT_s{si}of{sn}.txt')
     words, index_of, lay, vsets, order, units = setup()
+    # units finished by ANY log in this directory are never redone
     done = set()
-    if os.path.exists(LOG):
-        for line in open(LOG):
-            c0 = line.rstrip('\n').split('\t')
-            if len(c0) > 1 and c0[0] != 'unit':
-                done.add(int(c0[0]))
-        print(f'resuming: {len(done)} of {len(units)} units logged')
+    for f in sorted(os.listdir(SCRATCH)):
+        if f.startswith('gv_lead1') and f.endswith('.tsv'):
+            _logged(os.path.join(SCRATCH, f), done)
+    if done:
+        print(f'resuming: {len(done)} of {len(units)} units already logged')
     new = not os.path.exists(LOG)
     log = open(LOG, 'a')
     if new:
         log.write('unit\tarrangements\tderivations\twitness\tseconds\n'); log.flush()
-    todo = [i for i in range(len(units)) if i not in done]
-    print(f'{len(todo)} units, {len(P.PATHS)} paths each', flush=True)
+    todo = [i for i in range(len(units)) if i not in done and i % sn == si]
+    print(f'slice {si}/{sn}: {len(todo)} units, {len(P.PATHS)} paths each',
+          flush=True)
     t0 = time.time(); tn = td = 0; k = 0
     with Pool(4, initializer=_init) as pool:
         for idx, n, d, hit, w, secs in pool.imap_unordered(work, todo):
