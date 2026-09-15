@@ -1,0 +1,20 @@
+=== Crypto Puzzles 2018, Puzzle #2 -- final state of the read ===
+
+escrow (oracle target): 0x1fa8be9de5bbfe047c72db8e8e3257128f7661ad
+
+verified characters, by carrier:
+   part 1, seam A and seam B                6A6B0860B4   (10)
+   part 2, static block (after MIRROR)      C8           (2)
+   part 2, column (two half-streams joined) 723504       (6)
+   TOTAL                                    18 of 64
+
+most favourable possible packing (all 18 contiguous from position 0):
+   pinned           18
+   open             46
+   fully_unknown    46
+   candidates       24519928653854221733733552434404946937899825954937634816
+   feasible         False
+   eta              3.892e+43 years single-core at 20k keys/s
+
+assemble.plan() returns feasible=False -- the sweep is refused, correctly.
+A sweep closes a gap of about 8 characters. The gap is 46.
