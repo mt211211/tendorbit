@@ -161,3 +161,64 @@ the predicted one.
 Resumable: each completed unit is appended to a TSV and a restart skips logged units.
 On a hit the phrase is written to `GV_LEAD1_HIT.txt` and deliberately not printed,
 following the folder's protocol ("sweep the wallet before disclosing anything").
+
+---
+
+## RESULT — lead 1 is a certified negative
+
+The sweep completed on 2026-09-16.
+
+| | |
+|---|---|
+| units | **816 / 816**, every one `witness OK`, no gaps, no conflicting re-runs |
+| arrangements enumerated | **1,649,340,000** — exactly the closed form |
+| checksum-valid derivations | **103,079,649** |
+| derivation paths per phrase | **18** |
+| total derivations | **≈ 1.855 billion** |
+| matches | **0** |
+| wall clock | 20.98 h, 88.2 core-hours, 1,271 derivations/s |
+
+### Why this negative is trustworthy
+
+Three independent checks agree, and each would have caught a different failure:
+
+1. **Arrangement count matches the closed form exactly** (1,649,340,000), and every unit
+   enumerated an identical 2,021,250 arrangements. A generator that silently dropped or
+   duplicated rows could not land on the closed form to the digit.
+2. **Checksum acceptance came out at 1 in 16.0006.** BIP-39 reserves 4 bits of the last
+   word for the checksum, so a correctly built 12-word space accepts exactly 1 in 16.
+   A space built from malformed phrases would not.
+3. **Every unit carries a live witness.** Each re-derives its first candidate through a
+   fresh call and must agree; 816/816 returned OK. A unit reporting OK has proved its own
+   pipeline live rather than assuming it, so "0 matches" cannot be a silently dead oracle.
+
+The enumeration is the folder's own `scan_unit` — anchors, layout/fork-slot logic,
+post-side reading order and checksum filter all imported unchanged. Only `video_sets` was
+replaced, by `coin_vsets`. So this is a negative about the folder's model, not about a
+nearby space of my own construction.
+
+### What this closes
+
+Lead 3 killed "the author funded from a second MetaMask account". Lead 1 was the other
+live hypothesis: that the word pool was incomplete, since 122 BIP-0039 words are legible
+on screen in the challenge video and 109 of them appear in no written surface. Admitting
+the five portfolio-table words (`atom`, `link`, `basic`, `token`, `dash`) as free-position
+video words — the folder's own proposed next sweep — finds nothing, across 18 paths rather
+than the default path alone.
+
+So the RO1 reading-order model is now negative under both of its published repair
+hypotheses, over ~1.86 billion derivations in total across the two leads.
+
+### Honest read
+
+The remaining shells are bigger versions of the same idea: at most two coin words is 43 h,
+at most four is 51 h. I do not think they are worth running, and I said so before this
+sweep started rather than after. The prior that a phrase draws two or four words from the
+on-screen table is far below the prior for one, and the one-word shell — the most likely
+slice by a wide margin — is now empty.
+
+The conclusion I draw is that **the RO1 reading-order model is wrong**, not that its search
+space needs widening a third time. Both published repairs are dead, the enumeration is
+provably faithful to the folder's own, and the oracle is provably live. What is left is not
+a compute problem; it is the question of how the clue is meant to be read, which is an
+insight, not a sweep.
