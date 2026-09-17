@@ -222,3 +222,87 @@ space needs widening a third time. Both published repairs are dead, the enumerat
 provably faithful to the folder's own, and the oracle is provably live. What is left is not
 a compute problem; it is the question of how the clue is meant to be read, which is an
 insight, not a sweep.
+
+---
+
+## After lead 1: what I checked next, and where it actually stops
+
+With both published repairs dead I stopped sweeping and went back to the primary
+sources. Four things came out of it.
+
+### 1. Position 5 is `fog` — now settled on evidence, not assumption
+
+`data/seed-slots.json` records position 5 as **`"fog | cloud"`**, an open ambiguity,
+while `reading-order-pool.json` hardcodes `"fog": 5`. Every sweep on record — RO1,
+lead 3 and my own lead 1 — inherited `fog` without re-testing it. Had `cloud` been
+right, every one of those negatives would have been a negative about the wrong phrase.
+
+The README and `leads.md` both retire `cloud` *conditionally*: it "becomes live again
+if it turns out to be legible in the video image", and they name lead 1's on-screen
+words as the channel that decides it. That artifact now exists
+(`data/video-onscreen-words.json`), and **`cloud` appears in neither the on-screen nor
+the spoken list**. The condition resolves against `cloud`; the retirement stands, and
+it now rests on the evidence the folder said it needed rather than on inheritance.
+
+### 2. The anchors hold
+
+Checked directly against the 2048-word list rather than taken on trust:
+`dutch` is the **only** word in BIP-0039 naming the Netherlands, and of 16 bird words
+in the list `parrot` is the only genuinely tropical one (`kiwi` is the near-miss and
+is a flightless New Zealand bird). Anchors 1 and 12 are sound.
+
+### 3. My own next idea was already tested — checked before spending on it
+
+The author states 6 words hide in the video and 6 in the post, and exactly 5 sentences
+are statistically confirmed as planted (z = 3.71). Extracting BIP-0039 words from those
+sentences shows 8 that the RO1 pool never contained — `can`, `sing`, `song`, `then`,
+`goat`, `round`, `only`, `because` — excluded structurally, because RO1 assumes text
+position maps to seed position and so discards everything after `parrot` and before
+`dutch`. That is exactly the assumption I argued was wrong.
+
+It is also already closed. Sweep **P1** covered the planted-sentence content words
+(`dark`, `sing`, `song`, `goat`) and **C1** extended the pool with the connecting words
+(`can`, `then`, `only`, `because`, `like`) under 9! free orders — 18,657,475,200
+derivations, 0 match. I checked the ledger before building anything, which is the only
+reason this cost minutes instead of another 40 hours.
+
+### 4. A correction to my own lead 1
+
+Lead 1 admitted exactly five on-screen words: `atom`, `link`, `basic`, `token`, `dash`.
+The folder calls these "the five that match the portfolio-table prediction", but that is
+circular — they match the portfolio table because they **are** the portfolio table. They
+are ordinary crypto-UI vocabulary and therefore the *least* likely deliberate plants in
+the channel.
+
+Triaging all 109 on-screen words against the vocabulary a portfolio/browser UI emits by
+itself leaves 10 semantic outliers: **brave, dose, feature, liquid, panda, random,
+reveal, spice, spike, stick** (`brave` and `liquid` are probably the Brave browser and
+the Liquid exchange; the strongest residue is `panda`, `spice`, `spike`, `dose`).
+
+So my 21 hours bought the lowest-prior slice of the on-screen channel, not the highest.
+The sweep was sound and the negative is certified, but the slice was poorly chosen, and
+anyone continuing should start from the outliers rather than the coin words.
+
+### Where it stops
+
+`tested.md` names the real remaining work, and it matches what I concluded independently:
+
+> "Text shown on screen in the challenge video... This is the largest untested channel
+> and it is not a sweep, it is a reading task."
+
+The author says so himself in his spoken rules ("could be you know written in the video
+on the screen so read carefully"). The only reading done so far is one contributor's OCR
+of 431 frames at 720p, 1 fps, which produced a flat word list with no positions, no
+grouping and no frame context — enough to list candidates, not enough to tell a planted
+word from a UI label.
+
+**I cannot do that reading task from here.** Fetching the video, its thumbnails,
+mineshop.eu and the Wayback Machine all fail with `HTTP 403 Forbidden` on CONNECT — an
+organization network-policy denial, which this environment's rules say to report rather
+than retry or circumvent.
+
+The remaining sweeps are also out of reach, for a different reason. The on-screen words
+under free ordering is the genuinely open space, but C1 shows the scale: 9! orderings
+over a comparable pool cost 18.66 billion derivations, done on a rented GPU at ~1M/s for
+about $11. At this container's 1,270 derivations/s that is thousands of hours. CPU time
+bought leads 1 and 3; it cannot buy this one. It is cheap on the right hardware.
