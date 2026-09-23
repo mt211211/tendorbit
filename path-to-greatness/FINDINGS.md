@@ -105,3 +105,64 @@ March (5), All Art Must Die (7), Nocturnal Sugars, Seconds of Dream.
 No segment opened. Two certified negatives on segment 1 (1.92 billion tests), three
 steganographic channels ruled out, and one new cross-reference between clues 5 and 8. The
 single most useful input from outside would be the album's full tracklist.
+
+---
+
+## With the album tracklist (supplied 2026-09-23)
+
+"Seconds of Dream", Justin Patterson, 13 tracks:
+
+| # | title | length | | # | title | length |
+|---|---|---|---|---|---|---|
+| 1 | Few and Far Between | 2:52 | | 8 | Daylight Brings | 3:56 |
+| 2 | The Suffocating Carrier | 7:05 | | 9 | Hills of Life | 2:33 |
+| 3 | The Surrogate | 1:49 | | 10 | As Seen From Afar | 0:55 |
+| 4 | Exit Light | 2:05 | | 11 | The Great Adventure | 5:30 |
+| 5 | Ghost March | 3:01 | | 12 | Sequels | 7:13 |
+| 6 | Nocturnal Sugars | 4:19 | | 13 | Seconds of Dream | (14:43 by subtraction) |
+| 7 | All Art Must Die | 1:05 | | | | |
+
+Consistency: 13 tracks as the folder states; tracks 1, 6 and 13 are three of the four IVs
+(`few_n_far_btween`, `nocturnal_sugars`, `seconds_of_dream`); tracks 1–12 sum to 2,543 s,
+leaving 883 s (14:43) for the title track against the folder's 57:06 total.
+
+### Clue 8's rule, checked against the real titles
+
+Both worked examples reproduce exactly: the 4th letter of `exitlight` is `t`, the 8th of
+`ghostmarch` is `r` (spaces removed; with spaces kept the 8th would be `a`, so removal is
+confirmed).
+
+Reading the 13-cell string one cell per track (letter value = index into that title) gives
+`n o t _ h …`, but 5 of the 13 cells (`q N R U n`) ask for a letter past the end of their
+title, so that is not the whole rule. The folder's 17-digit form (`58112171456182114`) was
+tried against every starting track, both directions and both ends of each title (52
+orderings); none reads as English. Negative, consistent with the folder.
+
+### Clue 5's pictograms are album tracks
+
+The folder's lead 5 says the six pictograms "need a person who recognises the drawings".
+Three match titles directly:
+
+- the **ghost** (with a heart) → **Ghost March** (5)
+- the **sprout growing on a rounded hill** → **Hills of Life** (9)
+- the **old TV** on the clue 8 panel → **As Seen From Afar** (10): *tele-vision* is Greek for
+  "seeing from afar", which reads as a deliberate pun
+
+That makes the pictograms a second index into the album, the same dictionary clue 8 uses.
+Still unassigned: the **anchor**, the **three-headed devil** (one large head, two small copies:
+*Sequels*? *The Surrogate*?), the **horned helmet** (*The Great Adventure*?), the **stars
+around a question mark**, and from clue 8 the **banner marked 0,0,0** (spaced dots: *Few and
+Far Between*?), **three stars** (*Nocturnal Sugars*?), a **key-and-path** doodle and a
+**padlock**.
+
+### Detail visible only at full resolution
+
+Every triangle and pennant in clue 5 is **half-filled**: row 1's ▼ right half, rows 2–3's ▲
+left half; pennants top-filled, bottom-filled, top-filled. With "A bit of help from each
+line" in the poem, those halves may be literal bits rather than shading.
+
+## Where it stands
+
+No segment opened. What is new and verifiable: two certified segment 1 negatives (1.92
+billion tests), three stego channels ruled out, the tracklist confirmed against both
+clue 8 examples, and three of clue 5's pictograms tied to named tracks.
